@@ -76,6 +76,59 @@ Design a custom **AI/ML co-processor chiplet** that:
 
 ---
 
+---
+
+## Session 2 — April 1, 2026
+
+### What We Did
+
+**Codefest 1 CLLM tasks:**
+- Converted all PDFs in the ece410 folder to .txt using `pdftotext` (already installed)
+- Installed `torchvision` and ran ResNet-18 profiling with torchinfo (batch=1, FP32, 3x224x224)
+- Saved full profile to `codefest/cf01/profiling/resnet18_profile.txt`
+- Identified top-5 MAC layers and computed arithmetic intensity for the stem Conv2d (7x7) layer
+- Saved analysis to `codefest/cf01/profiling/resnet18_analysis.md`
+- Written and pushed `project/heilmeier_draft.md` (Q1-Q3) for the echo detection project
+- Written `project/algorithm_diagram.md` as a Mermaid source diagram
+- Updated `README.md` with name (Saleh Sabti) and project topic
+- All pushed to `saleh-sabti/ECE410`
+
+**Tools and skills installed:**
+- Installed `stop-slop` skill from github.com/hardikpandya/stop-slop into `~/.claude/skills/stop-slop`
+- Added rule to `~/.claude/CLAUDE.md`: apply stop-slop rules when editing any prose
+
+### Still Pending (before Sun Apr 5, 11:59pm)
+- Export `project/algorithm_diagram.md` to PNG at mermaid.live → save as `project/algorithm_diagram.png` → commit + push
+- Commit and push `codefest/cf01/cman_workload_accounting.md` (Saleh's hand-done CMAN file)
+
+### Main Design Decisions
+
+**Project topic: Hardware accelerator for real-time echo detection in voice signals**
+- Core algorithm: normalized cross-correlation between far-end reference and near-end mic signal
+- Output: 1-bit decision (echo present / not present) to trigger a downstream canceller
+- Parallelism: all N multiply-accumulate operations across the correlation window are independent — they all fire in the same clock cycle. That is the core hardware acceleration argument.
+- Weight storage: shift registers for both the reference and mic sample buffers. New sample shifts in each clock, oldest drops off. No addressing logic needed for streaming audio.
+- Architecture sketch: two shift registers (N samples each) feeding an N-wide MAC array, into a normalizer, into a threshold comparator.
+
+**Interface: TBD at M1** — will be justified based on arithmetic intensity and throughput analysis.
+
+### Important Questions Saleh Asked
+
+- How to run the smoke test manually → `vvp adder4_sim` or recompile with `iverilog`
+- What does the smoke test do → tests a 4-bit adder with carry, 5 input cases including overflow
+- Whether the CLLM profiling is connected to his project → no, it is a practice exercise using the same methodology he will apply to his own algorithm for M1
+- Whether his echo detection topic has enough parallelism → yes, cross-correlation is embarrassingly parallel (independent MACs)
+- Whether he should switch to a different topic (transformer matmul, conv layers, HDC) → decided to stick with echo detection
+- Where to store weights in hardware if using traditional registers → shift registers for streaming audio; SRAM for larger windows
+- How to carry session context into future Claude Code sessions → this file
+
+### ResNet-18 Key Numbers (for reference)
+- Total params: 11.7M, Total MACs: 1.81G
+- Most MAC-intensive layer: Conv2d 1-1 (7x7 stem), 118M MACs, 9,408 params
+- Arithmetic intensity of stem layer: ~61.3 FLOP/byte (compute-bound)
+
+---
+
 ## Useful Commands
 
 ```bash
