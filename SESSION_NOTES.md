@@ -92,3 +92,55 @@ git push
 python3 -c "import torch; print(torch.__version__)"
 python3 -c "import torchinfo; print(torchinfo.__version__)"
 ```
+
+---
+
+## Session 2: Context & Workflow Setup
+**Date:** April 1, 2026
+
+### What We Did
+- Explored project structure to understand existing files and organization
+- Created persistent memory system (MEMORY.md, project_overview.md, user_profile.md)
+- Clarified project status: M1 deadline is April 12 (11 days away)
+- Identified what's remaining for M1 completion
+
+### Project Files Inventory
+```
+codefest/cf01/          → ResNet18 analysis (profiling work)
+project/                → Heilmeier draft, algorithm diagram
+smoke_test/             → 4-bit adder (LLM smoke test)
+SESSION_NOTES.md        → Setup and progress tracking
+README.md               → Project overview
+```
+
+### Key Design Decisions Made
+1. **Algorithm Choice:** Normalized cross-correlation for echo detection (regular, predictable computation — ideal for custom hardware)
+2. **Hardware Scope:** Fixed-function chiplet (no branching, no variable inputs, small/fast/cheap)
+3. **Problem Motivation:** Remove CPU burden, reduce latency (<1ms), enable downstream cancellation
+4. **Target Applications:** Voice calls on earbuds, hearing aids, smart speakers (battery-constrained)
+
+### M1 Remaining Tasks (Apr 12 deadline)
+- [ ] Finish Heilmeier Catechism (Q4-Q7: cost, timeline, stakeholders, competition)
+- [ ] Write Python software baseline (reference echo detection implementation)
+- [ ] Roofline analysis (peak performance vs. algorithm demands)
+- [ ] Interface selection (SPI/I2C/AXI4-Lite/AXI4-Stream/PCIe/UCIe)
+- [ ] Block diagram (hardware + host integration)
+
+### Important Questions Asked
+1. **"What is the best way to work?"** → Answer: Start with one deliverable at a time; Heilmeier → Python baseline → roofline → interface → block diagram
+2. **"I feel there are lots of files and such"** → Answer: Organized by milestone; SESSION_NOTES.md is your main context document; use it to track decisions and progress
+
+### Codefest 1 CMAN Analysis
+Created `codefest/cf01/cman_calculator.py` — automated roofline analysis tool
+- Input: Layer dimensions (fully-connected networks)
+- Output: MACs, parameters, memory usage, arithmetic intensity
+- Validates handwritten CMAN calculations from Code HW1 assignment
+- Classifies networks as memory-bound vs. compute-bound
+- Pushed to GitHub (commit: 91315ad)
+
+### Next Steps
+1. Complete Heilmeier Catechism (remaining Q4-Q7)
+2. Write Python correlation-based echo detector
+3. Run roofline analysis on the Python implementation
+4. Finalize interface choice and block diagram
+5. Push all M1 deliverables to GitHub before April 12
