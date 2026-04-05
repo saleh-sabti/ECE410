@@ -1,0 +1,13 @@
+# Local working files — not for the public repo
+CLAUDE.md
+SESSION_NOTES.md
+TASKS.md
+.claude/
+dashboard.html
+recent notes.txt
+
+# Course lecture PDFs and auto-converted txt files
+hw4ai_*.pdf
+hw4ai_*.txt
+w1_mon_*.pdf
+w1_mon_*.txt
