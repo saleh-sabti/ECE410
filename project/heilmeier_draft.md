@@ -1,15 +1,18 @@
-# Heilmeier Catechism — Draft
+# Heilmeier Draft
 ECE 410/510 Spring 2026 | Saleh Sabti
 
-## Q1: What are you trying to do?
-Build a hardware chiplet that listens to voice audio in real time and decides whether an echo is present. It takes two inputs: the far-end reference signal (what the speaker is playing out) and the near-end microphone signal. It outputs one bit: echo present or not. A downstream cancellation stage uses that decision to know when to act.
+## What I'm building
 
-## Q2: How is it done today, and what are the limits of current practice?
-Echo detection today runs in software on a CPU or DSP, using adaptive correlation filters like LMS or NLMS, sometimes a small ML classifier. Three problems come up consistently.
+A hardware chiplet that takes two audio streams (far-end reference and near-end mic) and outputs one bit: echo present or not. No CPU in the detection path.
 
-First, latency. Software adds milliseconds of detection delay, which is audible in a live call. Second, CPU load. The detection loop runs continuously and competes with other audio tasks, causing jitter when the system is busy. Third, power. Keeping a CPU core active for correlation burns far more energy than a dedicated circuit would, which matters for earbuds, hearing aids, and smart speakers running on battery.
+## How it works today and why that's a problem
 
-## Q3: What is new in your approach and why do you think it will work?
-The idea is a fixed-function chiplet that does nothing but compute the normalized cross-correlation between the two audio streams and compare it to a threshold. The CPU is not involved in the detection path at all.
+Echo detection runs in software on a CPU or DSP, usually LMS or NLMS adaptive filters, sometimes a small classifier on top.
 
-This works for a specific reason: cross-correlation echo detection is a regular, predictable computation. Every sample window is the same operation: a dot product, a normalization, a compare. That regularity is exactly what makes a problem a good fit for custom hardware. There is no branching to handle, no variable-length input, no memory access pattern that changes at runtime. The hardware can be small, fast, and cheap to run.
+Three things break down. Latency: software detection adds milliseconds of delay that's audible on a live call. CPU load: the detection loop competes with other audio tasks and causes jitter under load. Power: keeping a CPU core alive for correlation burns far more than a dedicated circuit, which matters for earbuds and hearing aids on a battery budget.
+
+## Why hardware works here
+
+The chiplet computes normalized cross-correlation between the two signals and compares it to a threshold. That's the whole computation.
+
+Every window is the same operation: dot product, normalization, compare. No branching, no variable-length inputs, no shifting memory access patterns. That's the profile custom silicon handles well. All N multiply-accumulate operations in a window are independent and fire in the same clock cycle. Keeping the sample buffers in on-chip shift registers removes DRAM traffic. The software baseline runs at 0.747 FLOP/byte (memory-bound). The hardware version isn't.

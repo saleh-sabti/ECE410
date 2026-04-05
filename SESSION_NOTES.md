@@ -129,6 +129,37 @@ Design a custom **AI/ML co-processor chiplet** that:
 
 ---
 
+## Session 3 — April 5, 2026
+
+### What We Did
+
+**Codefest 1 status check:**
+- Reviewed all deliverables against the official requirements
+- Found two files not committed: `codefest/cf01/cman_workload_accounting.md` and `project/algorithm_diagram.png`
+- Professor note flagged: algorithm must be in plain Python/C/C++ — avoid relying on PyTorch/scipy for the core loop (bottleneck would be inside the library, not measurable)
+
+**Python reference implementation (`project/echo_detect.py`):**
+- Wrote a pure Python normalized cross-correlation echo detector — no numpy/scipy/torch in the core loop
+- Every MAC is explicit in a for loop
+- Synthetic signals: reference = mix of 200/440/800 Hz sinusoids; mic = reference + delayed echo (ECHO_GAIN × reference[i − ECHO_DELAY]) + noise
+- Option A chosen: fully synthetic signals (no real audio file needed), self-contained, reproducible
+- Parameters: SAMPLE_RATE=16000, N=128 (8 ms window), ECHO_DELAY=320 samples (20 ms), ECHO_GAIN=0.5, THRESHOLD=0.7
+- Key output numbers: 12.2M MACs for 2s of audio, 384 MACs/window (3×N), AI = 0.747 FLOP/byte → memory-bound
+- This is the M1 software baseline
+
+### Key Numbers (current parameters)
+- Total MACs: 12,238,848
+- MACs per window: 384 (3 × N=128)
+- Arithmetic intensity: 0.747 FLOP/byte → memory-bound
+- Hardware argument: keeping shift register buffers on-chip eliminates DRAM traffic and changes the bound
+
+### Still Pending
+- Commit `codefest/cf01/cman_workload_accounting.md` and `project/algorithm_diagram.png` — due tonight Sun Apr 5 11:59pm
+- Decide on window size N for hardware design (currently 128)
+- M1 due Sun Apr 12: software baseline (done), roofline analysis, interface selection, block diagram
+
+---
+
 ## Useful Commands
 
 ```bash
