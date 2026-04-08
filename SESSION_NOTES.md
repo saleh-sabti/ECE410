@@ -158,3 +158,45 @@ Design a custom **AI/ML co-processor chiplet** that:
 - Decide on window size N for hardware design (currently 128)
 - M1 due Sun Apr 12: software baseline (done), roofline analysis, interface selection, block diagram
 
+---
+
+## Session 4 — April 8, 2026
+
+### What We Did
+
+**Repo cleanup and file organization:**
+- Added `project/roofline_plot.py` and `project/roofline.png` (M1 roofline deliverable, generated Apr 6)
+- Added `codefest/cf02/hw4ai_explainer.jsx` (660-line React explainer component)
+- Added week 2 lecture slides and assignment PDFs
+- Reorganized `assignments/` into `week1/` and `week2/` subfolders
+- Fixed `.gitignore` — changed `hw4ai_*.pdf` to `/hw4ai_*.pdf` so `assignments/` subdirs are no longer filtered
+- Added `assignments/week2/hw4ai_ece510_codefest02_spring26_r2.pdf` and `hw4ai_ece510_project_milestone_1_spring26_r1.pdf`
+
+**Read CF2 and M1 specs — key findings:**
+- CF2 CMAN: no AI, hand-draw roofline for given hardware (10 TFLOPS, 320 GB/s, ridge = 31.25 FLOP/byte), classify GEMM and vector-add kernels
+- CF2 CLLM: profile echo_detect.py, compute AI, build roofline with HW design point, write partition rationale, update Heilmeier
+- M1 introduces `project/m1/` folder (new): sw_baseline.md, interface_selection.md, system_diagram.png
+- `project/heilmeier_draft.md` must be renamed/moved to `project/heilmeier.md` for M1 grader path check
+- Existing `project/roofline.png` must be copied to `codefest/cf02/profiling/roofline_project.png`
+
+### Still Pending (due Sun Apr 12)
+
+**CF2 CMAN (Saleh does alone, no AI):**
+- Hand-draw roofline (log-log, ridge point labeled) for 10 TFLOPS / 320 GB/s hardware
+- GEMM 1024x1024: compute FLOPs, bytes, AI, attainable GFLOP/s, bound, arch recommendation
+- Vector-add 4M: same
+- Deliver as `codefest/cf02/cman_roofline.md` (or .pdf/.png)
+
+**CF2 CLLM (AI OK):**
+- Profile `project/echo_detect.py` with cProfile (10+ runs) → `codefest/cf02/profiling/project_profile.txt`
+- Write `codefest/cf02/analysis/ai_calculation.md` (FLOPs formula, bytes, AI = 0.747 FLOP/byte, dominant kernel %)
+- Generate `codefest/cf02/profiling/roofline_project.png` (SW point + HW design point both labeled)
+- Write `codefest/cf02/analysis/partition_rationale.md` (200-350 words, all 4 sub-questions)
+- Update `project/heilmeier.md` (Q1-Q3, data-grounded)
+
+**M1 (due same deadline):**
+- Create `project/m1/sw_baseline.md` (platform, median wall-clock over 10 runs, throughput, memory)
+- Create `project/m1/interface_selection.md` (interface choice, bandwidth calc, bottleneck analysis)
+- Create `project/m1/system_diagram.png` (host + interface + chiplet boundary + compute + on-chip memory, all labeled)
+- Rename `project/heilmeier_draft.md` to `project/heilmeier.md`
+
