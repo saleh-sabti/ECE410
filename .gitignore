@@ -8,8 +8,8 @@ project/echo_detect_explainer.html
 smoke_test/adder4_sim
 recent notes.txt
 
-# Course lecture PDFs and auto-converted txt files
-hw4ai_*.pdf
-hw4ai_*.txt
-w1_mon_*.pdf
-w1_mon_*.txt
+# Course lecture PDFs and auto-converted txt files (root only)
+/hw4ai_*.pdf
+/hw4ai_*.txt
+/w1_mon_*.pdf
+/w1_mon_*.txt
