@@ -1,5 +1,4 @@
 # Algorithm Block Diagram
-> Export this diagram to PNG and save as `algorithm_diagram.png`
 
 ```mermaid
 flowchart LR
