@@ -8,7 +8,7 @@ Project: Echo Detection Chiplet
 
 The kernel to accelerate in hardware is `normalized_xcorr` in `echo_detect.py:47`. cProfile across 10 runs shows it accounts for 86% of total runtime. It is the only loop in the algorithm: three parallel dot-product accumulators over N=128 samples. All N multiply-accumulate operations per accumulator are data-independent, so they can fire in a single clock cycle on a parallel MAC array.
 
-The roofline confirms the choice. On the Intel Core Ultra 7 155H (68.3 GB/s DRAM, 460.8 GFLOP/s peak), the kernel sits at AI = 0.747 FLOP/byte, well below the ridge at 6.74 FLOP/byte. It is memory-bound, meaning DRAM bandwidth is the bottleneck, not compute. A chiplet with on-chip shift registers eliminates the DRAM traffic entirely: both the reference and mic sample windows live in two N-deep shift registers. That changes the effective AI from 0.747 (off-chip) to compute-bound territory.
+The roofline confirms the choice. On the Intel Core Ultra 7 155H (119.5 GB/s DRAM, 460.8 GFLOP/s peak), the kernel sits at AI = 0.747 FLOP/byte, well below the ridge at 3.86 FLOP/byte. It is memory-bound, meaning DRAM bandwidth is the bottleneck, not compute. A chiplet with on-chip shift registers eliminates the DRAM traffic entirely: both the reference and mic sample windows live in two N-deep shift registers. That changes the effective AI from 0.747 (off-chip) to compute-bound territory.
 
 ## (b) What the software baseline continues to handle
 
@@ -26,6 +26,6 @@ The chiplet is nowhere near interface-bound at this operating point. Even at the
 
 ## (d) Bound classification and whether HW changes it
 
-On the current CPU, the kernel is **memory-bound** (AI = 0.747 < ridge = 6.74 FLOP/byte). The bottleneck is fetching 128 ref and 128 mic samples from DRAM on every window.
+On the current CPU, the kernel is **memory-bound** (AI = 0.747 < ridge = 3.86 FLOP/byte). The bottleneck is fetching 128 ref and 128 mic samples from DRAM on every window.
 
 The hardware design eliminates this bottleneck. Shift registers hold both N-sample windows on-chip. A new sample shifts in each clock cycle; the oldest drops off. No DRAM access during detection. The chiplet's on-chip bandwidth is 128 MACs × 2 operands × 4 bytes × 500 MHz = 512 GB/s, and its compute ceiling is 128 GFLOP/s (128 MACs × 500 MHz × 2 FLOP). Ridge point = 128 / 512 = 0.25 FLOP/byte. Since AI = 0.747 > 0.25, **the HW design is compute-bound**, the opposite classification from software.
