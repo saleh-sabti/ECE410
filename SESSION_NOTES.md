@@ -200,3 +200,44 @@ Design a custom **AI/ML co-processor chiplet** that:
 - Create `project/m1/system_diagram.png` (host + interface + chiplet boundary + compute + on-chip memory, all labeled)
 - Rename `project/heilmeier_draft.md` to `project/heilmeier.md`
 
+---
+
+## Session 5 — April 9, 2026
+
+### What We Did
+
+**CF2 CLLM — all deliverables built and pushed:**
+- Ran cProfile on `echo_detect.py` across 10 runs → `codefest/cf02/profiling/project_profile.txt`
+- `normalized_xcorr` identified as dominant kernel: 69% of total program runtime, 87% of streaming detection loop
+- Wrote `codefest/cf02/analysis/ai_calculation.md` — full FLOPs derivation (768 FLOP/window), bytes (1,028 bytes/window), AI = 0.747 FLOP/byte
+- Generated `codefest/cf02/profiling/roofline_project.png` — CPU roofline (Intel Core Ultra 7 155H) + SW point (memory-bound) + HW chiplet design point (compute-bound)
+- Wrote `codefest/cf02/analysis/partition_rationale.md` — 290 words, all 4 sub-questions answered with numbers
+- Updated `project/heilmeier.md` from draft — Q1-Q3 grounded in profiling data
+- Removed `project/heilmeier_draft.md`
+
+**CF2 CMAN — Saleh's hand-drawn work transcribed:**
+- `codefest/cf02/cman_roofline.md` — GEMM (AI=170.7, compute-bound, 10000 GFLOP/s) and vector-add (AI=0.083, memory-bound, 26.7 GFLOP/s)
+- `codefest/cf02/image.png` — hand-drawn roofline scan committed and referenced in markdown
+
+**M1 — all deliverables built and pushed:**
+- `project/m1/sw_baseline.md` — Intel Core Ultra 7 155H, WSL2, Python 3.12.3, median 260 ms over 10 runs, 122,585 windows/s, 16.8 MB RSS
+- `project/m1/interface_selection.md` — AXI4 Stream, 0.064 MB/s required vs 400 MB/s rated, not interface-bound
+- `project/m1/system_diagram.png` — block diagram with all 5 labeled components
+
+**CPU specs corrected mid-session:**
+- System shows LPDDR5X-7467 (not 6400) → peak BW = 119.5 GB/s, ridge = 3.86 FLOP/byte (not 6.74)
+- All files updated with correct numbers
+
+### Key Numbers (current)
+- Algorithm: normalized cross-correlation, N=128, 768 FLOP/window
+- AI = 0.747 FLOP/byte (no DRAM reuse)
+- CPU: Intel Core Ultra 7 155H, 119.5 GB/s BW, 460.8 GFLOP/s peak, ridge = 3.86 FLOP/byte → SW is memory-bound
+- Chiplet: 128 MACs @ 500 MHz, 512 GB/s on-chip, 128 GFLOP/s peak, ridge = 0.25 FLOP/byte → HW is compute-bound
+- SW median wall-clock: 260 ms for 2s audio (31,872 windows)
+- Interface: AXI4 Stream, required 0.064 MB/s
+
+### Still Pending
+- M2 (due May 3): HDL module + testbench, interface module in HDL
+- M3 (due May 24): OpenLane 2 synthesis
+- M4 (due Jun 7): full deliverable package + report
+
