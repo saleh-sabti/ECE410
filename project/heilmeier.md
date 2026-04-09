@@ -16,8 +16,8 @@ The dominant kernel is normalized cross-correlation: three dot-product accumulat
 
 Software echo detection runs a normalized cross-correlation loop on a CPU. Profiling `echo_detect.py` on an Intel Core Ultra 7 155H over 10 runs shows:
 
-- `normalized_xcorr` accounts for **86% of runtime** (dominant kernel)
-- Median wall-clock: **280 ms** to process 2 s of audio (31,872 windows)
+- `normalized_xcorr` accounts for **69% of total runtime**, 87% of detection loop (dominant kernel)
+- Median wall-clock: **260 ms** to process 2 s of audio (31,872 windows)
 - Arithmetic intensity: **0.747 FLOP/byte**, memory-bound on this CPU (ridge = 3.86 FLOP/byte)
 - Attainable throughput: ~89 GFLOP/s (bandwidth ceiling)
 

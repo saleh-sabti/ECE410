@@ -6,7 +6,7 @@ Algorithm: Normalized cross-correlation echo detection (`project/echo_detect.py`
 
 ## Dominant Kernel
 
-`normalized_xcorr` in `echo_detect.py:47` accounts for 86% of total runtime across 10 profiled runs (see `project_profile.txt`). It is the inner correlation loop, called once per audio window.
+`normalized_xcorr` in `echo_detect.py:47` accounts for 69% of total program runtime and 87% of streaming detection time across 10 profiled runs (see `project_profile.txt`). It is the inner correlation loop, called once per audio window.
 
 ---
 
