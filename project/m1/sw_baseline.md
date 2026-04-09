@@ -9,7 +9,8 @@ Project: Echo Detection Chiplet
 | Field | Value |
 |-------|-------|
 | CPU | Intel Core Ultra 7 155H (Meteor Lake, 6P+8E cores) |
-| OS | Ubuntu 22.04 (WSL2 on Windows 11) |
+| RAM | 16 GB LPDDR5X-7467, 2-channel (119.5 GB/s peak BW) |
+| OS | Windows 11 Home 25H2 / WSL2 Ubuntu |
 | Python | 3.12.3 |
 | Script | `project/echo_detect.py` |
 | Input | Synthetic signals, 2.0 s @ 16 kHz = 32,000 samples |

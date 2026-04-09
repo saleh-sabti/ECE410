@@ -60,11 +60,11 @@ AI = Total FLOPs / Total bytes
 
 ## Roofline Classification
 
-Target platform: Intel Core Ultra 7 155H (laptop)  
-- Peak DRAM bandwidth: 68.3 GB/s (Intel ARK, LPDDR5-6400)  
+Target platform: Intel Core Ultra 7 155H (Lenovo Yoga Pro 7 14IMH9)  
+- Peak DRAM bandwidth: **119.5 GB/s** (LPDDR5X-7467, 2-channel 128-bit bus: 7467 MT/s × 16 B)  
 - Peak FP32 throughput: 460.8 GFLOP/s (6 P-cores × 4.8 GHz boost × 16 FLOP/cycle, AVX2 FMA)  
-- Ridge point: 460.8 / 68.3 = **6.74 FLOP/byte**
+- Ridge point: 460.8 / 119.5 = **3.86 FLOP/byte**
 
-AI = 0.747 < ridge = 6.74 → **kernel is memory-bound on this CPU**
+AI = 0.747 < ridge = 3.86 → **kernel is memory-bound on this CPU**
 
-Attainable performance = min(460.8, 68.3 × 0.747) = min(460.8, 51.0) = **51.0 GFLOP/s**
+Attainable performance = min(460.8, 119.5 × 0.747) = min(460.8, 89.3) = **89.3 GFLOP/s**

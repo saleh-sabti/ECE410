@@ -18,8 +18,8 @@ Software echo detection runs a normalized cross-correlation loop on a CPU. Profi
 
 - `normalized_xcorr` accounts for **86% of runtime** (dominant kernel)
 - Median wall-clock: **280 ms** to process 2 s of audio (31,872 windows)
-- Arithmetic intensity: **0.747 FLOP/byte** — memory-bound on this CPU (ridge = 6.74 FLOP/byte)
-- Attainable throughput: ~51 GFLOP/s (bandwidth ceiling, not compute ceiling)
+- Arithmetic intensity: **0.747 FLOP/byte** — memory-bound on this CPU (ridge = 3.86 FLOP/byte)
+- Attainable throughput: ~89 GFLOP/s (bandwidth ceiling, not compute ceiling)
 
 The limits are three: latency (285 ms end-to-end is not usable for real-time gating), power (a P-core running the detection loop draws far more than a dedicated circuit), and CPU load (the detection loop competes with other audio tasks and causes jitter). The memory-bound classification means the software version is wasting most of its compute capacity waiting on DRAM.
 
