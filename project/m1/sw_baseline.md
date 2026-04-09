@@ -15,7 +15,7 @@ Project: Echo Detection Chiplet
 | Script | `project/echo_detect.py` |
 | Input | Synthetic signals, 2.0 s @ 16 kHz = 32,000 samples |
 | Window size | N = 128 samples (8 ms) |
-| Batch size | N/A — streaming, one window at a time |
+| Batch size | N/A, streaming one window at a time |
 
 ---
 

@@ -6,7 +6,7 @@ Algorithm: Normalized cross-correlation echo detection (`project/echo_detect.py`
 
 ## Dominant Kernel
 
-`normalized_xcorr` in `echo_detect.py:47` — accounts for 86% of total runtime across 10 profiled runs (see `project_profile.txt`). This is the inner correlation loop called once per audio window.
+`normalized_xcorr` in `echo_detect.py:47` accounts for 86% of total runtime across 10 profiled runs (see `project_profile.txt`). It is the inner correlation loop, called once per audio window.
 
 ---
 
@@ -34,7 +34,7 @@ Total windows = total_samples - N = 32,000 - 128 = 31,872
 
 ## Bytes Transferred (DRAM, no reuse)
 
-Per window, operands loaded from DRAM assuming no cache reuse:
+Per window, all operands load from DRAM with no cache reuse:
 
 | Operand | Count | Bytes (FP32 = 4 B) |
 |---------|-------|---------------------|

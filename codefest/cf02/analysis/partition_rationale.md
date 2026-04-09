@@ -8,7 +8,7 @@ Project: Echo Detection Chiplet
 
 The kernel to accelerate in hardware is `normalized_xcorr` in `echo_detect.py:47`. cProfile across 10 runs shows it accounts for 86% of total runtime. It is the only loop in the algorithm: three parallel dot-product accumulators over N=128 samples. All N multiply-accumulate operations per accumulator are data-independent, so they can fire in a single clock cycle on a parallel MAC array.
 
-The roofline confirms the choice. On the Intel Core Ultra 7 155H (119.5 GB/s DRAM, 460.8 GFLOP/s peak), the kernel sits at AI = 0.747 FLOP/byte, well below the ridge at 3.86 FLOP/byte. It is memory-bound, meaning DRAM bandwidth is the bottleneck, not compute. A chiplet with on-chip shift registers eliminates the DRAM traffic entirely: both the reference and mic sample windows live in two N-deep shift registers. That changes the effective AI from 0.747 (off-chip) to compute-bound territory.
+The roofline confirms the choice. On the Intel Core Ultra 7 155H (119.5 GB/s DRAM, 460.8 GFLOP/s peak), the kernel sits at AI = 0.747 FLOP/byte, below the ridge at 3.86 FLOP/byte. DRAM bandwidth is the bottleneck. A chiplet with on-chip shift registers removes the DRAM traffic: both sample windows live in two N-deep shift registers, moving the kernel from memory-bound to compute-bound.
 
 ## (b) What the software baseline continues to handle
 
@@ -22,7 +22,7 @@ AXI4 Stream at 100 MHz with a 32-bit data bus delivers 400 MB/s rated bandwidth.
 
 Required bandwidth / interface bandwidth = 0.064 / 400 = 0.016% utilization.
 
-The chiplet is nowhere near interface-bound at this operating point. Even at the minimum AXI4 Stream configuration (8-bit bus, 10 MHz) the interface still supplies 10 MB/s, which is 156× the audio data rate.
+The chiplet is not interface-bound. At minimum AXI4 Stream configuration (8-bit bus, 10 MHz), the interface delivers 10 MB/s, 156× the audio data rate.
 
 ## (d) Bound classification and whether HW changes it
 

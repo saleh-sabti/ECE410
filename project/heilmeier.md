@@ -18,10 +18,10 @@ Software echo detection runs a normalized cross-correlation loop on a CPU. Profi
 
 - `normalized_xcorr` accounts for **86% of runtime** (dominant kernel)
 - Median wall-clock: **280 ms** to process 2 s of audio (31,872 windows)
-- Arithmetic intensity: **0.747 FLOP/byte** — memory-bound on this CPU (ridge = 3.86 FLOP/byte)
-- Attainable throughput: ~89 GFLOP/s (bandwidth ceiling, not compute ceiling)
+- Arithmetic intensity: **0.747 FLOP/byte**, memory-bound on this CPU (ridge = 3.86 FLOP/byte)
+- Attainable throughput: ~89 GFLOP/s (bandwidth ceiling)
 
-The limits are three: latency (285 ms end-to-end is not usable for real-time gating), power (a P-core running the detection loop draws far more than a dedicated circuit), and CPU load (the detection loop competes with other audio tasks and causes jitter). The memory-bound classification means the software version is wasting most of its compute capacity waiting on DRAM.
+Three limits: latency (285 ms end-to-end is too slow for real-time gating), power (a P-core running the detection loop draws far more than a fixed circuit), and CPU load (the loop competes with audio tasks and causes jitter). At 0.747 FLOP/byte, the software wastes most of its compute budget waiting on DRAM.
 
 ---
 
@@ -29,6 +29,6 @@ The limits are three: latency (285 ms end-to-end is not usable for real-time gat
 
 A dedicated chiplet with N=128 parallel MACs and on-chip shift register storage for both sample windows. The shift registers hold 128 reference and 128 mic samples on-chip; a new sample shifts in each clock, the oldest drops off. No DRAM access during detection.
 
-This changes the bound. On-chip bandwidth: 128 MACs × 2 operands × 4 bytes × 500 MHz = 512 GB/s. Peak compute: 128 GFLOP/s. Ridge point: 0.25 FLOP/byte. The kernel's AI = 0.747 > 0.25, so the chiplet operates **compute-bound** — the opposite of the software baseline.
+On-chip bandwidth: 128 MACs × 2 operands × 4 bytes × 500 MHz = 512 GB/s. Peak compute: 128 GFLOP/s. Ridge point: 0.25 FLOP/byte. The kernel's AI = 0.747 > 0.25, so the chiplet is **compute-bound**.
 
-Attainable throughput: 128 GFLOP/s (at the compute ceiling), versus 51 GFLOP/s for the CPU (at the bandwidth ceiling). Latency per window: 1 clock cycle = 2 ns at 500 MHz, versus ~8.8 µs per window in software. The hardware argument holds because the algorithm has no branching, fixed window size, and perfectly regular data access — exactly the profile custom silicon handles well.
+Attainable throughput: 128 GFLOP/s versus 89 GFLOP/s in software. Latency per window: 2 ns at 500 MHz versus 8.8 µs in software. The algorithm has no branching, fixed window size, and regular data access, which is the profile fixed silicon handles well.
