@@ -8,7 +8,8 @@ Median wall-clock: 373.3 ms
 Min wall-clock:    364.1 ms
 
 Dominant kernel: normalized_xcorr (echo_detect.py:47)
-  -- accounts for the largest share of cumulative time across all runs
+  -- 69% of total program runtime (cumtime 2.569s / 3.721s)
+  -- 87% of streaming detection loop (cumtime 2.569s / run_streaming 2.937s)
 
 cProfile cumulative stats (30 entries, 10 runs accumulated):
 ======================================================================

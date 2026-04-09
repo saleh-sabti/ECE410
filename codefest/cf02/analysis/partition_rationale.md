@@ -6,7 +6,7 @@ Project: Echo Detection Chiplet
 
 ## (a) Which kernel to accelerate and why the roofline supports that choice
 
-The kernel to accelerate in hardware is `normalized_xcorr` in `echo_detect.py:47`. cProfile across 10 runs shows it accounts for 86% of total runtime. It is the only loop in the algorithm: three parallel dot-product accumulators over N=128 samples. All N multiply-accumulate operations per accumulator are data-independent, so they can fire in a single clock cycle on a parallel MAC array.
+The kernel to accelerate in hardware is `normalized_xcorr` in `echo_detect.py:47`. cProfile across 10 runs shows it accounts for 69% of total program runtime (87% of the streaming detection loop). It is the only loop in the algorithm: three parallel dot-product accumulators over N=128 samples. All N multiply-accumulate operations per accumulator are data-independent, so they can fire in a single clock cycle on a parallel MAC array.
 
 The roofline confirms the choice. On the Intel Core Ultra 7 155H (119.5 GB/s DRAM, 460.8 GFLOP/s peak), the kernel sits at AI = 0.747 FLOP/byte, below the ridge at 3.86 FLOP/byte. DRAM bandwidth is the bottleneck. A chiplet with on-chip shift registers removes the DRAM traffic: both sample windows live in two N-deep shift registers, moving the kernel from memory-bound to compute-bound.
 
