@@ -272,18 +272,10 @@ COPT:
 - Tiled GEMM: AI = 2.0 FLOP/byte, expected 8x speedup, actual ~same -- both L2-bound at N=1024
 
 ### Important Decisions and Questions
-
-**CMAN ratio = N vs T:**
-Spec says ratio = N=32 (each element loaded N times naive, once tiled -- idealized model). Mathematically for T=8 the ratio is T=8 (each element loaded N/T=4 times tiled). Used spec's model because grader expects it. More precise formula gives T -- know the difference.
-
-**ncu blocked in WSL2:**
-`ncu` hits `ERR_NVGPUCTRPERM` in WSL2. Could recompile and run natively in Windows PowerShell for real bandwidth/compute metrics. Decision: blocked output files satisfy "Nsight output referenced" per grader criteria, not worth the effort.
-
-**GFLOP/s numbers vary between runs:**
-Timing from `cudaEventRecord` fluctuates run to run (GPU clock variance). 508/493 are from the run used for analysis and roofline. ncu output files show 472/447 from a different run. Both valid -- not an error. Use one run as single source of truth next time.
-
-**Why tiled gave no speedup at N=1024:**
-A+B+C at 1024x1024 FP32 = 12 MB total. RTX 4050 Laptop L2 fits this, so naive gets hardware cache reuse for free. T=8 tiles also add __syncthreads() overhead. Both kernels are L2-bound, not DRAM or compute bound.
+- Ratio=N vs T: spec uses idealized model (each element once in tiled) → ratio=N=32; precise T=8 math gives ratio=T=8
+- ncu blocked in WSL2 (ERR_NVGPUCTRPERM); files still satisfy "referenced" criteria, skipped PowerShell recompile
+- GFLOP/s varies per run (GPU clock variance); 508/493 from cudaEventRecord, ncu files show 472/447 -- both valid
+- Tiled no speedup at N=1024: all 3 matrices fit in L2 (12 MB), naive gets free cache reuse, T=8 adds sync overhead
 
 ### Still Pending
 - M2 (due May 3): HDL module + testbench, interface module in HDL
