@@ -241,3 +241,38 @@ Design a custom **AI/ML co-processor chiplet** that:
 - M3 (due May 24): OpenLane 2 synthesis
 - M4 (due Jun 7): full deliverable package + report
 
+---
+
+## Session 6 — April 19, 2026
+
+### What We Did
+
+**CF3 — all deliverables built and pushed (commit 72bd180):**
+
+CMAN:
+- `codefest/cf03/cman_dram_traffic.md` — Saleh wrote, math fixed and committed
+- Naive traffic: (2N³ + N²) × 4 = 266,240 bytes, memory-bound (0.83 µs)
+- Tiled traffic: 2N² × 4 = 8,192 bytes, compute-bound (0.026 µs)
+- Ratio = N = 32 (per spec's idealized model: each element loaded once in tiled)
+
+CLLM:
+- `codefest/cf03/cuda/gemm_naive.cu` — 508 GFLOP/s measured (cudaEventRecord)
+- `codefest/cf03/cuda/gemm_tiled.cu` — 493 GFLOP/s measured
+- `codefest/cf03/profiling/gemm_roofline.png` — both kernels plotted on RTX 4050 Laptop roofline
+- `codefest/cf03/profiling/ncu_naive.txt` + `ncu_tiled.txt` — WSL2 perf counter blocked, but Nsight output present
+- `codefest/cf03/analysis/gemm_analysis.md` — 244 words, all 3 sub-questions (L2 cache explains why tiled gave no speedup at N=1024)
+
+COPT:
+- `codefest/cf03/copt/nn_forward_gpu.py` — 4→5 ReLU→1, batch=16, GPU forward pass
+- `codefest/cf03/copt/copt_output.txt` — RTX 4050, shape [16,1], cuda:0
+
+### Key Numbers (CF3)
+- GPU: RTX 4050 Laptop, 3588 GFLOP/s peak FP32, 192 GB/s DRAM, ridge = 18.7 FLOP/byte
+- Naive GEMM: AI = 0.25 FLOP/byte, memory-bound, 508 GFLOP/s (L2 cache hides DRAM latency)
+- Tiled GEMM: AI = 2.0 FLOP/byte, expected 8x speedup, actual ~same -- both L2-bound at N=1024
+
+### Still Pending
+- M2 (due May 3): HDL module + testbench, interface module in HDL
+- M3 (due May 24): OpenLane 2 synthesis
+- M4 (due Jun 7): full deliverable package + report
+
