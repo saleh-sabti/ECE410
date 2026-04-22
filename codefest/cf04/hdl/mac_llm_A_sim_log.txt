@@ -1,0 +1,10 @@
+VCD info: dumpfile mac_tb.vcd opened for output.
+PASS step 0: out=0
+PASS step 1: out=12
+PASS step 2: out=24
+PASS step 3: out=36
+PASS step 4: out=0
+PASS step 5: out=-10
+PASS step 6: out=-20
+ALL TESTS PASSED
+mac_tb.v:55: $finish called at 66000 (1ps)
