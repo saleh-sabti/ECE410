@@ -42,7 +42,7 @@ async def test_mac_basic(dut):
 
 @cocotb.test()
 async def test_mac_overflow(dut):
-    """Verify accumulator wraps (2s complement) — does not saturate."""
+    """Verify accumulator wraps (2s complement), does not saturate."""
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     dut.rst.value = 1

@@ -72,7 +72,7 @@ ALL TESTS PASSED
 
 ## Issues Found
 
-### Issue 1 — Over-sized multiplier (mac_llm_B.v, Gemini)
+### Issue 1: Over-sized multiplier (mac_llm_B.v, Gemini)
 
 **Offending lines:**
 ```systemverilog
@@ -91,7 +91,7 @@ out <= out + {{16{product[15]}}, product};        // sign-extend to 32
 
 ---
 
-### Issue 2 — Redundant `signed'()` outer cast (mac_llm_B.v, Gemini)
+### Issue 2: Redundant `signed'()` outer cast (mac_llm_B.v, Gemini)
 
 **Offending lines:**
 ```systemverilog
@@ -110,7 +110,7 @@ out <= out + (32'(a) * 32'(b));
 
 ---
 
-### Issue 3 — Sign extension ambiguity via implicit size cast (mac_llm_A.v, Claude)
+### Issue 3: Sign extension ambiguity via implicit size cast (mac_llm_A.v, Claude)
 
 **Offending lines:**
 ```systemverilog
