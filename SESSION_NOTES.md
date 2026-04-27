@@ -284,7 +284,7 @@ COPT:
 
 ---
 
-## Session 7 — April 22–26, 2026
+## Session 7: April 22-26, 2026
 
 ### What We Did
 
@@ -294,30 +294,30 @@ COPT:
 - Installed cocotb 2.0.1 via pip
 
 **CF4 CMAN (Saleh wrote, Claude cleaned up):**
-- `codefest/cf04/cman_quantization.md` — all 5 tasks
+- `codefest/cf04/cman_quantization.md`: all 5 tasks
 - max|W| = 2.31, S = 0.018189, correct S MAE = 0.00433, S_bad = 0.01 MAE = 0.171
 - 4 elements clamp with S_bad; one-sentence explanation included
 
 **CF4 CLLM:**
-- `mac_llm_A.v` — Claude Sonnet 4.6 output
-- `mac_llm_B.v` — Gemini 3.1 Pro output (Saleh pasted from Gemini)
-- `mac_tb.v` — iverilog testbench, 7 steps, all pass for both LLMs and mac_correct
-- `mac_correct.v` — explicit 16-bit product, sign extension via `{{16{product[15]}}, product}`
-- `codefest/cf04/review/mac_code_review.md` — 3 issues: Gemini over-sized multiplier (32x32), redundant signed'() cast, Claude sign extension portability via 32'(a*b)
+- `mac_llm_A.v`: Claude Sonnet 4.6 output
+- `mac_llm_B.v`: Gemini 3.1 Pro output (Saleh pasted from Gemini)
+- `mac_tb.v`: iverilog testbench, 7 steps, all pass for both LLMs and mac_correct
+- `mac_correct.v`: explicit 16-bit product, sign extension via `{{16{product[15]}}, product}`
+- `codefest/cf04/review/mac_code_review.md`: 3 issues identified (Gemini over-sized multiplier, redundant signed'() cast, Claude sign extension portability)
 - Compile results and sim logs recorded verbatim
 
 **CF4 COPT:**
-- `codefest/cf04/cocotb_mac/test_mac.py` — test_mac_basic + test_mac_overflow, both pass
-- `codefest/cf04/cocotb_mac/Makefile` — WAVES=1, icarus
-- `codefest/cf04/cocotb_mac/sim_log.txt` — 2/2 PASS
-- `codefest/cf04/cocotb_mac/waveform.png` — generated from VCD via matplotlib (GTKWave zoom issue)
+- `codefest/cf04/cocotb_mac/test_mac.py`: test_mac_basic + test_mac_overflow, both pass
+- `codefest/cf04/cocotb_mac/Makefile`: WAVES=1, icarus
+- `codefest/cf04/cocotb_mac/sim_log.txt`: 2/2 PASS
+- `codefest/cf04/cocotb_mac/waveform.png`: generated from VCD via matplotlib (GTKWave zoom issue)
 - Overflow: wraps at -2147455462 after 133146 cycles of +16129, no saturation
-- `project/hdl/echo_detect_core.sv` — N=128, DW=16, parameterized skeleton with shift regs + accumulator stub
-- `project/hdl/echo_detect_core_tb.py` — cocotb stub: reset, no-echo, full-correlation tests
-- README updated: INT16 precision justification, AXI4 Stream bandwidth justification paragraph
+- `project/hdl/echo_detect_core.sv`: N=128, DW=16, parameterized skeleton with shift regs + accumulator stub
+- `project/hdl/echo_detect_core_tb.py`: cocotb stub with reset, no-echo, full-correlation tests
+- README updated with INT16 precision justification and AXI4 Stream bandwidth justification
 
 ### Key Decisions
-- Precision: INT16 for audio samples — full codec dynamic range, no quantization noise at 16-bit
+- Precision: INT16 for audio samples, full codec dynamic range, no quantization noise at 16-bit
 - Interface: AXI4 Stream confirmed from M1, 0.064 MB/s required vs 400 MB/s rated = 6250x headroom
 - mac_correct.v: explicit 16-bit intermediate is the portable fix vs both LLM outputs
 
