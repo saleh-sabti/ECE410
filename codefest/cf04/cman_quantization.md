@@ -1,6 +1,6 @@
-# CF4 CMAN — INT8 Symmetric Quantization
+# CF4 CMAN: INT8 Symmetric Quantization
 
-## Task 1 — Scale Factor
+## Task 1: Scale Factor
 
 max(|W|) = 2.31, at position [2,3]
 
@@ -8,7 +8,7 @@ S = 2.31 / 127 = **0.018189**
 
 ---
 
-## Task 2 — Quantize
+## Task 2: Quantize
 
 W_q = round(W / S), clamped to [-128, 127]
 
@@ -40,7 +40,7 @@ W_q = [  47,  -66,   19,  115 ]
 
 ---
 
-## Task 3 — Dequantize
+## Task 3: Dequantize
 
 W_deq = W_q x S
 
@@ -72,7 +72,7 @@ W_deq = [  0.8549, -1.2005,  0.3456,  2.0917 ]
 
 ---
 
-## Task 4 — Error Analysis
+## Task 4: Error Analysis
 
 | Position | W | W_deq | abs error |
 |----------|---|-------|-----------|
@@ -101,7 +101,7 @@ MAE = 0.0692 / 16 = **0.00433**
 
 ---
 
-## Task 5 — S_bad = 0.01 Experiment
+## Task 5: S_bad = 0.01 Experiment
 
 With S_bad = 0.01, the representable range is [-1.28, 1.27]. Four elements fall outside it and saturate.
 
