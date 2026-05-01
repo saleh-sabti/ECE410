@@ -1,0 +1,5 @@
+VCD info: dumpfile project/m2/sim/compute_core.vcd opened for output.
+PASS  test1: echo_det=1 valid_out=1 (acc_cross=128 >= 64)
+PASS  test2: echo_det=0 valid_out=1 (acc_cross=-128 < 64)
+PASS  compute_core: 2/2 tests passed
+project/m2/tb/tb_compute_core.sv:98: $finish called at 2660000 (1ps)
