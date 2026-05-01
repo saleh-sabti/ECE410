@@ -6,6 +6,8 @@ Samples are signed 16-bit integer (INT16). Standard audio PCM at 16 kHz is INT16
 
 Accumulators are 40-bit signed (ACCW=40). Each product of two INT16 values is at most 32767² ≈ 1.07 × 10⁹, which fits in 30 bits. Summing 128 of them gives at most 1.37 × 10¹¹, which needs 37 bits. 40 bits adds 3 bits of headroom and aligns to a 5-byte boundary. A 32-bit accumulator overflows on large-amplitude correlated inputs.
 
+The M1 roofline analysis measured AI = 0.747 FLOP/byte for the software baseline (2 bytes per INT16 sample, 768 FLOP per 128-sample window). Using FP32 would double sample byte traffic to 4 bytes per sample, dropping AI to 0.374 FLOP/byte and pushing the design further into the memory-bound region. INT16 keeps byte traffic at 2 bytes per sample and preserves the on-chip bandwidth advantage that makes the chiplet compute-bound at 512 GB/s internal bandwidth.
+
 ## Normalization
 
 Full normalized cross-correlation divides by sqrt(ref_energy × mic_energy). This module skips that step. The comparison is acc_cross ≥ threshold, where threshold is set by the caller in accumulated units.
