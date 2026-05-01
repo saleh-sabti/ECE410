@@ -1,10 +1,10 @@
 `timescale 1ns/1ps
 
-// tb_interface.sv  —  Testbench for axi4s_rx (interface.sv)
+// tb_interface.sv : Testbench for axi4s_rx (interface.sv)
 //
-// Test 1 (write): TVALID=1, TDATA=32'hABCD_1234 -> ref_out=0xABCD, mic_out=0x1234, valid_out=1
-// Test 2 (idle):  TVALID=0                       -> valid_out=0
-// Test 3 (back-to-back): two consecutive beats, verify each decoded independently
+// Test 1: TVALID=1, TDATA=0xABCD_1234. Expect ref_out=0xABCD, mic_out=0x1234, valid_out=1.
+// Test 2: TVALID=0. Expect valid_out=0.
+// Test 3: two back-to-back beats, verify each decoded independently.
 
 module tb_interface;
 

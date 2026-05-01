@@ -1,5 +1,5 @@
 /*
- * compute_core.sv  —  Echo detection compute core
+ * compute_core.sv : Echo detection compute core
  *
  * Ports:
  *   clk        in    1         clock (single domain)
@@ -9,13 +9,11 @@
  *   mic_in     in   DW         near-end mic sample (signed INT16)
  *   threshold  in   ACCW       echo threshold in accumulated cross-correlation units
  *   echo_det   out   1         1 = echo detected (acc_cross >= threshold)
- *   valid_out  out   1         output valid; asserted one cycle after window fills
+ *   valid_out  out   1         output valid; goes high N+1 valid_in cycles after reset
  *
- * Algorithm: unnormalized cross-correlation Σref[i]*mic[i] vs threshold.
- *   Full normalization (÷ sqrt(ref_energy * mic_energy)) deferred; documented in precision.md.
- * Precision: INT16 samples, 40-bit signed accumulators (32-bit product + 8 overhead bits).
- * Clock domain: single. Reset: synchronous, active-high.
- * Latency: outputs valid N+1 valid_in cycles after reset (window fill).
+ * Computes Σref[i]*mic[i] over a sliding N-sample window and compares against threshold.
+ * Full normalization (÷ sqrt(ref_energy * mic_energy)) is deferred to M3; see precision.md.
+ * INT16 samples, 40-bit signed accumulators. Single clock domain, synchronous active-high reset.
  */
 module compute_core #(
     parameter int N    = 128,

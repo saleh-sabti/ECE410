@@ -1,14 +1,10 @@
 `timescale 1ns/1ps
 
-// tb_compute_core.sv  —  Testbench for compute_core
+// tb_compute_core.sv : Testbench for compute_core
 //
-// Test 1 (echo present): ref[i]=1, mic[i]=1 for N=128 samples
-//   acc_cross = 128, threshold = 64  =>  echo_det=1, valid_out=1  expected PASS
-//
-// Test 2 (no echo): ref[i]=1, mic[i]=-1 for N=128 samples
-//   acc_cross = -128, threshold = 64  =>  echo_det=0, valid_out=1  expected PASS
-//
-// Reference values computed independently (Python: sum(1*1 for _ in range(128)) = 128).
+// Test 1 (echo): ref=1, mic=1 for N=128 samples. acc_cross=128, threshold=64. Expect echo_det=1.
+// Test 2 (no echo): ref=1, mic=-1. acc_cross=-128. Expect echo_det=0.
+// Reference: Python sum(1*1 for _ in range(128)) = 128, sum(1*-1 for _ in range(128)) = -128.
 
 module tb_compute_core;
 
