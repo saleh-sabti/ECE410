@@ -1,0 +1,7 @@
+VCD info: dumpfile project/m2/sim/interface.vcd opened for output.
+PASS  test1: ref_out=0xABCD mic_out=0x1234 valid_out=1
+PASS  test2: valid_out=0 when TVALID=0
+PASS  test3a: beat1 ref=1 mic=2 valid_out=1
+PASS  test3b: beat2 ref=3 mic=4 valid_out=1
+PASS  axi4s_rx: 4/4 tests passed
+project/m2/tb/tb_interface.sv:90: $finish called at 80000 (1ps)
