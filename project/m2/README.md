@@ -1,16 +1,16 @@
-# M2 — Echo Detection Chiplet: RTL and Testbenches
+# M2: Echo Detection Chiplet RTL
 
 ## Simulator
 
-Icarus Verilog 12.0 (iverilog / vvp)
+Icarus Verilog 12.0
 
 ```bash
-iverilog --version   # should print: Icarus Verilog version 12.0
+iverilog --version
 ```
 
-## Reproducing the Simulations
+## Running the Simulations
 
-Run from the repo root:
+Run from repo root:
 
 ```bash
 # Compute core
@@ -26,32 +26,28 @@ iverilog -g2012 -o /tmp/if_sim \
 vvp /tmp/if_sim
 ```
 
-Expected output for both: last line printed is `PASS ...`.
+Both end with `PASS ...`. VCD files write to `project/m2/sim/` relative to working directory. Run from repo root or update the `$dumpfile` paths in the testbenches if you move things around.
 
-VCD files are written to `project/m2/sim/` relative to the working directory. Run from repo root or adjust `$dumpfile` paths in the testbenches.
+## Modules
 
-## Module Overview
+### `compute_core.sv`: module `compute_core`
 
-### `compute_core.sv` — module `compute_core`
+Sliding window cross-correlator. Holds two N=128 shift registers (ref and mic samples). Each clock cycle it multiplies all 128 pairs in parallel and sums them into a 40-bit accumulator. Outputs `echo_det=1` when that sum exceeds threshold. INT16 inputs. First valid output appears N+1 valid_in cycles after reset.
 
-Computes unnormalized cross-correlation over a sliding N=128 sample window. Outputs `echo_det=1` when `acc_cross >= threshold`. INT16 inputs, 40-bit signed accumulators.
+### `interface.sv`: module `axi4s_rx`
 
-Latency: N+1 valid_in cycles after reset before the first valid output.
+`interface` is a reserved keyword in SystemVerilog so the module is named `axi4s_rx`. File stays `interface.sv` per the M2 spec.
 
-### `interface.sv` — module `axi4s_rx`
+AXI4-Stream slave. TREADY is wired high because the required data rate is 0.064 MB/s vs. the protocol's rated 400 MB/s: back-pressure is not needed. TDATA[31:16] = ref sample, TDATA[15:0] = mic sample. Outputs the decoded pair to compute_core with 1-cycle latency.
 
-Note: `interface` is a reserved keyword in SystemVerilog; the module is named `axi4s_rx`. File is named `interface.sv` per M2 spec.
+## Changes from M1
 
-AXI4-Stream slave. TREADY is wired high (no back-pressure; required data rate is 0.064 MB/s vs. AXI4-S rated 400 MB/s). TDATA[31:16] = ref sample, TDATA[15:0] = mic sample. Outputs decoded pair to compute_core with 1-cycle latency.
+None. Interface stays AXI4-Stream as selected in `project/m1/interface_selection.md`.
 
-## Deviations from M1
-
-None. Interface remains AXI4-Stream as selected in `project/m1/interface_selection.md`.
-
-## Python dependencies (waveform generation only)
+## Python dependency (waveform only)
 
 ```
-matplotlib>=3.5
+matplotlib >= 3.5
 ```
 
-The simulation logs and waveform are already committed; re-running the waveform script is not required for grading.
+Logs and waveform are already committed. No need to re-run the waveform script for grading.
