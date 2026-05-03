@@ -3,62 +3,71 @@
 
 ## Project: Echo Detection Chiplet
 
-A fixed-function chiplet that computes normalized cross-correlation between a far-end reference signal and a near-end mic signal and outputs one bit: echo present or not. No CPU in the detection path.
+A fixed-function chiplet that detects echoes in a phone call in real time. It takes two audio streams: the speaker output (far-end reference) and the mic input (near-end), computes their cross-correlation over a 128-sample window, and outputs one bit: echo present or not. No CPU in the detection path.
 
-Every window is the same operation: dot product, normalization, compare. That makes it a good fit for custom silicon. All N MACs in a window are independent and fire in the same clock cycle. On-chip shift registers hold the sample buffers, eliminating DRAM traffic. The software baseline runs at 0.747 FLOP/byte (memory-bound). The hardware version runs at 0.747 FLOP/byte against a 0.25 ridge — compute-bound.
+All 128 multiply-accumulate operations across a window are independent and fire in the same clock cycle. On-chip shift registers hold both sample buffers, so no DRAM traffic. The software baseline sits at 0.747 FLOP/byte (memory-bound on CPU). The chiplet flips that: compute-bound at 128 GFLOP/s peak against a 0.25 FLOP/byte ridge point.
 
-## HDL Compute Core
+**Interface: AXI4-Stream.** Required throughput is 0.064 MB/s at 16 kHz stereo INT16. AXI4-Stream is rated at 400 MB/s: 6250x headroom, never the bottleneck.
 
-`project/hdl/echo_detect_core.sv` implements the top-level compute module for the chiplet. It takes one INT16 sample pair per cycle (ref, mic), maintains N=128 shift registers on-chip, and accumulates the three dot products needed for normalized cross-correlation. Output is a 1-bit echo detection flag.
-
-**Precision: INT16.** Audio samples from a 16-bit DAC/ADC sit in the range [-32768, 32767]. INT8 would lose 8 bits of dynamic range, introducing quantization noise that pushes the correlation threshold uncertainty above acceptable limits for echo detection. INT16 preserves full codec precision with no off-chip quantization step.
-
-**Interface: AXI4 Stream.** The M1 arithmetic intensity analysis found the chiplet needs 0.064 MB/s of sample throughput at 16 kHz, 16-bit stereo (ref + mic). AXI4 Stream rated at 400 MB/s gives a 6250x headroom margin, so the interface is never the bottleneck. AXI4 Stream is also the natural fit for sample-at-a-time streaming: no addressing overhead, built-in flow control via TVALID/TREADY, and direct path into the on-chip shift registers without buffering.
+**Precision: INT16.** Full 16-bit codec dynamic range (96 dB SNR). INT8 loses 48 dB and degrades detection under low-SNR conditions. FP32 doubles byte traffic with no benefit since inputs are already quantized at the ADC.
 
 ## Repo Structure
 
 ```
 codefest/
-  cf01/                         Codefest 1 — CMAN hand calcs, ResNet-18 profiling
-  cf02/                         Codefest 2 — CMAN roofline, cProfile, partition rationale
-  cf03/                         Codefest 3 — GEMM CUDA kernels, roofline, COPT GPU forward pass
-  cf04/
-    hdl/
-      mac_llm_A.v               Claude Sonnet 4.6 MAC output
-      mac_llm_B.v               GPT-4o MAC output (pending)
-      mac_tb.v                  Verilog testbench
-      mac_correct.v             Corrected implementation
-    review/
-      mac_code_review.md        LLM comparison and issue analysis
-    cocotb_mac/
-      test_mac.py               cocotb testbench (basic + overflow)
-      Makefile                  cocotb + icarus build
-    cman_quantization.md        INT8 symmetric quantization (hand-computed)
+  cf01/                         CMAN hand calcs, ResNet-18 profiling
+  cf02/                         CMAN roofline, cProfile, partition rationale
+  cf03/                         GEMM CUDA kernels, roofline, COPT GPU forward pass
+  cf04/                         INT8 quantization, MAC HDL (LLM A/B + correct), cocotb tests
+  cf05/                         Systolic array trace (CMAN, due May 3)
 
 project/
   heilmeier.md                  Heilmeier Q1-Q3, data-grounded
-  algorithm_diagram.png         Block diagram (from CF1)
   echo_detect.py                Software baseline — pure Python, explicit MAC loop
-  roofline_plot.py              Roofline plot script
-  hdl/
-    echo_detect_core.sv         Top-level compute core, N=128, INT16, parameterized
+  roofline_plot.py / roofline.png
+  algorithm_diagram.png
   m1/
-    sw_baseline.md              Platform, median 260ms, throughput, memory
-    interface_selection.md      AXI4 Stream — bandwidth calc and justification
-    system_diagram.png          High-level system block diagram
+    sw_baseline.md              Intel Core Ultra 7 155H, median 260ms over 10 runs
+    interface_selection.md      AXI4-Stream selection and bandwidth justification
+    system_diagram.png          Host + interface + chiplet block diagram
+  m2/
+    rtl/
+      compute_core.sv           Synthesizable compute core — parallel MAC tree, INT16, 40-bit acc
+      interface.sv              AXI4-Stream slave (module: axi4s_rx)
+    tb/
+      tb_compute_core.sv        2/2 PASS
+      tb_interface.sv           4/4 PASS
+    sim/
+      compute_core_run.log      Simulation transcript
+      interface_run.log         Simulation transcript
+      waveform.png              7-signal annotated waveform
+    precision.md                INT16 rationale, overflow analysis, error analysis, roofline tie-in
+    README.md                   Reproduction instructions
 
 smoke_test/
-  adder4.v / adder4_tb.v       LLM smoke test — 4-bit adder in Verilog
+  adder4.v / adder4_tb.v       LLM smoke test — 4-bit adder
+```
+
+## Running M2 Simulations
+
+Requires Icarus Verilog 12.0. Run from repo root:
+
+```bash
+iverilog -g2012 -o /tmp/cc_sim project/m2/rtl/compute_core.sv project/m2/tb/tb_compute_core.sv
+vvp /tmp/cc_sim
+
+iverilog -g2012 -o /tmp/if_sim project/m2/rtl/interface.sv project/m2/tb/tb_interface.sv
+vvp /tmp/if_sim
 ```
 
 ## Milestones
 
 | Milestone | Due | Status |
 |-----------|-----|--------|
-| Codefest 1 | Apr 5 | Done |
-| Codefest 2 + M1 | Apr 12 | Done |
-| Codefest 3 | Apr 19 | Done |
-| Codefest 4 | Apr 27 | In progress |
-| M2 | May 3 | Not started |
+| CF1 | Apr 5 | Done |
+| CF2 + M1 | Apr 12 | Done |
+| CF3 | Apr 19 | Done |
+| CF4 | Apr 27 | Done |
+| CF5 + M2 | May 3 | M2 done / CF5 CMAN in progress |
 | M3 | May 24 | Not started |
 | M4 | Jun 7 | Not started |
