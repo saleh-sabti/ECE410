@@ -326,3 +326,75 @@ COPT:
 - M3 (due May 24): OpenLane 2 synthesis
 - M4 (due Jun 7): full deliverable package + report
 
+---
+
+## Session 8: May 2, 2026
+
+### What We Did
+
+**Added Week 5 docs:**
+- Copied `assignments/Week5/`: CF5 PDF, M2 spec PDF, two lecture slides (TPU/GPU/transformers recap)
+
+**M2 — all deliverables built, simulated, and pushed:**
+
+`project/m2/rtl/compute_core.sv`: synthesizable SystemVerilog compute core
+- Two N=128 shift registers (ref and mic buffers), INT16 samples
+- Combinational parallel MAC tree: 128 multipliers fire every cycle, result summed into 40-bit accumulator
+- Outputs echo_det=1 when acc_cross >= threshold (threshold is a port, not a parameter)
+- Single clock domain, synchronous active-high reset
+- First valid output appears N+1 valid_in cycles after reset (window fill latency)
+
+`project/m2/rtl/interface.sv`: AXI4-Stream slave (module named axi4s_rx)
+- TREADY wired high (no back-pressure: 0.064 MB/s required vs 400 MB/s rated)
+- TDATA[31:16] = ref sample, TDATA[15:0] = mic sample
+- Decoded pair out to compute_core with 1-cycle latency
+
+`project/m2/tb/tb_compute_core.sv`: 2/2 PASS
+- Test 1: ref=1, mic=1 for 128 samples. acc_cross=128 >= 64. echo_det=1. ✓
+- Test 2: ref=1, mic=-1. acc_cross=-128 < 64. echo_det=0. ✓
+- Reference values from Python: sum(1*1 for _ in range(128)) = 128
+
+`project/m2/tb/tb_interface.sv`: 4/4 PASS
+- Test 1: TDATA=0xABCD_1234 → ref_out=0xABCD, mic_out=0x1234, valid_out=1
+- Test 2: TVALID=0 → valid_out=0
+- Test 3a/b: two back-to-back beats, each decoded correctly
+
+`project/m2/sim/`: compute_core_run.log, interface_run.log (both PASS), waveform.png
+- Waveform shows 7 signals: clk, rst, valid_in, ref_in, mic_in, echo_det, valid_out
+- Annotated with rst↓ and echo_det↑ events
+
+`project/m2/precision.md`: 526 words
+- INT16 chosen: 96 dB dynamic range, direct codec/ADC compatibility
+- 40-bit accumulators: max sum = 1.37 × 10¹¹, needs 37 bits, 40 gives headroom
+- Roofline tie-in: INT16 keeps AI at 0.747 FLOP/byte; FP32 would halve it to 0.374
+- Sqrt normalization deferred to M3 (hardware sqrt costs area + pipeline stages)
+- Error analysis: 0 LSB error vs float64 reference on all test vectors
+
+`project/m2/README.md`: exact iverilog commands, module notes, deviations from M1 (none)
+
+**Prose pass:** stop-slop applied to all markdown and SV header comments. All em dashes removed.
+
+### Key Decisions
+
+- **`interface` is a SV reserved keyword**: module named `axi4s_rx`, file stays `interface.sv` per M2 spec. Documented in header and README. No fix possible without renaming the file.
+- **Sqrt normalization deferred**: comparing raw acc_cross against threshold works for constant-amplitude signals and is correct for M2. Full normalization (CORDIC or Newton-Raphson) goes into M3.
+- **Threshold as port**: lets the caller tune it per signal level rather than baking it in as a parameter.
+- **Combinational MAC tree**: for loop in always_comb synthesizes as 128 parallel multipliers feeding a reduction tree. Timing-critical path for large N but correct and synthesizable.
+- **iverilog timing**: valid_out only asserts when valid_in is high AND window is full. Need N+1 valid_in pulses minimum to see one valid output. Testbench checks outputs at the posedge where window_full first goes true with valid_in=1, before clearing valid_in.
+
+### Key Numbers
+
+- N=128, DW=16, ACCW=40
+- Testbench threshold: 40'sd64
+- acc_cross (ref=1, mic=1, N=128) = 128 (computed from Python, exact in INT16)
+- Compute core latency: N+1 = 129 valid_in cycles
+
+### Still Pending
+
+- **CF5 CMAN (Saleh, due May 3):** `codefest/cf05/cman_systolic_trace.md`
+  - 2×2 weight-stationary systolic array trace, A=[[1,2],[3,4]], B=[[5,6],[7,8]]
+  - PE diagram, ≥4-row cycle table, MAC count, reuse count, off-chip access count, output-stationary one-liner
+  - NO AI
+- M3 (due May 24): OpenLane 2 synthesis
+- M4 (due Jun 7): full deliverable package + report
+
