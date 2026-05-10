@@ -391,10 +391,52 @@ COPT:
 
 ### Still Pending
 
-- **CF5 CMAN (Saleh, due May 3):** `codefest/cf05/cman_systolic_trace.md`
-  - 2×2 weight-stationary systolic array trace, A=[[1,2],[3,4]], B=[[5,6],[7,8]]
-  - PE diagram, ≥4-row cycle table, MAC count, reuse count, off-chip access count, output-stationary one-liner
-  - NO AI
 - M3 (due May 24): OpenLane 2 synthesis
 - M4 (due Jun 7): full deliverable package + report
+
+---
+
+## Session 9: May 10, 2026
+
+### What We Did
+
+**Week 6 content added:**
+- Copied `assignments/week6/`: CF6 PDF (r4), recap slides, transformers-in-memory slides
+
+**CF5 solutions review (professor email):**
+- Professor flagged many students got the input sequence wrong (cycle skew)
+- Saleh's CF5: got C[0][0]=19 and C[1][0]=43 correct, but missing C[0][1]=22 (cycle 3) and C[1][1]=50 (cycle 4)
+- Output-stationary description was slightly off: said "partial sums stay" instead of "C[i][j] stays resident while A and B stream past"
+- Still earned S due to 70% threshold
+
+**CF6 CMAN — `codefest/cf06/cman_sneak_path.md`:**
+- 2x2 resistive crossbar: R[0][0]=1kΩ (on), R[0][1]=2kΩ (off), R[1][0]=2kΩ (off), R[1][1]=1kΩ (on)
+- (a) Ideal read: I_col0 = 1V/1kΩ = 1 mA
+- (b) KCL at floating nodes: V_row1=0.4V, V_col1=0.6V
+  - Equivalent shortcut: sneak path is series chain 2k+1k+2k=5kΩ, sneak current = 1V/5kΩ = 0.2mA
+- (c) Actual I_col0 = 1mA + 0.2mA = 1.2mA (20% over ideal)
+- (d) Sneak path explanation: undriven rows couple to driven rows through off-state resistors, inject current into sensed columns, errors accumulate with array size
+
+**CF6 CLLM — `codefest/cf06/hdl/`:**
+- `crossbar_mac.sv`: 4x4 binary-weight MAC, weights stored in 4x4 register array, loaded via 16-bit wdata bus, outputs 10-bit signed
+- `crossbar_tb.sv`: weights=[[1,-1,1,-1],[1,1,-1,-1],[-1,1,1,-1],[-1,-1,-1,1]], inputs=[10,20,30,40]
+- `sim_log.txt`: all 4 outputs PASS — [-40, 0, -20, -20]
+- wdata encoding: wdata[4*i+j] = w[i][j], 1=+1, 0=-1, packed as 16'b1000_0110_0011_0101
+- Simulated with Icarus Verilog 12, compiled with -g2012
+
+**Shine prep (local only, not on GitHub):**
+- `codefest/cf06/shine_prep.html`: plain English study guide, Shine script (5 min), quiz Q&A
+- Kept off GitHub — history wiped with git filter-branch + force push
+
+### Key Numbers (CF6)
+
+- Sneak path: V_row1=0.4V, V_col1=0.6V, sneak current=0.2mA, error=20%
+- Crossbar MAC outputs: out=[-40, 0, -20, -20] for inputs=[10,20,30,40]
+- Output bit width: 10-bit signed (max sum = 4×127 = 508)
+
+### Still Pending
+
+- M3 (due May 24): OpenLane 2 synthesis
+- M4 (due Jun 7): full deliverable package + report
+- Quiz 2: coming up — study systolic array cycle skew, output-stationary definition, crossbar sneak paths
 
