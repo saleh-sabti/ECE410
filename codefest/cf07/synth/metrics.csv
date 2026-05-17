@@ -1,0 +1,2 @@
+design,clock_period_ns,setup_worst_slack_ns,hold_worst_slack_ns,setup_vio_count,total_cells,chip_area_um2,routing_status
+compute_core,10.0,-103.526,0.057,12318,243521,87336.26,FAILED_DRT-0349
