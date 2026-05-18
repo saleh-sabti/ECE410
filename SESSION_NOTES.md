@@ -440,3 +440,55 @@ COPT:
 - M4 (due Jun 7): full deliverable package + report
 - Quiz 2: coming up — study systolic array cycle skew, output-stationary definition, crossbar sneak paths
 
+---
+
+## Session 10: May 13-14, 2026
+
+### What We Did
+
+**Week 7 content reviewed:**
+- `assignments/week7/`: CF7 PDF (r3), w7_mon_neuromorphic_chips.pdf, w7_mon_recap.pdf, w7_wed_codefest_7.pdf
+- Lecture topics: in-memory computing (IMC/PiM), non-von Neumann architectures, neuromorphic chips, ASIC design flow, OpenLane 2 tools, CSR sparse format, inference vs training in systolic arrays
+
+**CF7 CLLM — all deliverables built and pushed (commits 8f5ad1f, 4462307):**
+- `codefest/cf07/hdl/synth_top.sv`: compute_core.sv copied, Verilator lint suppress comments added (BLKLOOPINIT on array for-loops)
+- Ran OpenLane 2.3.10 dockerized on sky130A PDK (sky130_fd_sc_hd), 10 ns clock target
+- `codefest/cf07/synth/synthesis.log`: Yosys synthesis log
+- `codefest/cf07/synth/sta_summary.rpt`: pre-PNR STA timing report
+- `codefest/cf07/synth/metrics.csv`: key metrics summary
+- `codefest/cf07/synth/synth_interpretation.md`: 232 words, all 4 sub-questions answered
+- `codefest/cf07/synth/m3_plan.md`: ~130 words, pipelining plan grounded in synthesis numbers
+- `project/scope_assessment.md`: updated post-synthesis
+
+**Synthesis result summary:**
+- Total cells: 243,521; chip area: 87,336 µm²
+- Worst setup slack: -103.526 ns (critical path 113.5 ns, max freq 8.8 MHz at 10 ns target)
+- Hold slack: +0.057 ns, zero hold violations
+- Detailed routing FAILED (DRT-0349): too many cells for default floorplan
+- Root cause: fully combinational 128-MAC adder tree, no pipeline registers
+- Top 3 cell types: ANDNOT (77,655), XOR (66,450), AND (36,340)
+
+**CF7 CMAN — pending:**
+- `codefest/cf07/cman_sparsity_analysis.md`: Saleh does this (no AI)
+- N=512 MVM, CSR format, sparsity breakeven analysis
+
+### Key Numbers (CF7 synthesis)
+
+- Clock target: 10 ns (100 MHz); actual critical path: 113.5 ns; max freq: 8.8 MHz
+- Setup slack: -103.526 ns (12,318 violations); hold slack: +0.057 ns (0 violations)
+- Cell count: 243,521; area: 87,336 µm²
+- Max slew violations: 104,888
+- Routing: FAILED at stage 44/78
+
+### Key Decisions
+
+- M3 plan: pipeline adder tree after level 3-4, target 20 ns clock (50 MHz)
+- If pipelining doesn't close routing, drop N from 128 to 64
+- Sqrt normalization stays deferred (area already large without it)
+
+### Still Pending
+
+- CF7 CMAN: `codefest/cf07/cman_sparsity_analysis.md` (Saleh)
+- M3 (due May 24): re-run OpenLane with pipelined compute_core + larger DIE_AREA
+- M4 (due Jun 7): full deliverable package + report
+
