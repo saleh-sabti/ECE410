@@ -4,17 +4,16 @@
 
 ## Clock and Slack
 
-Target clock: 10 ns (100 MHz). Worst-case setup slack (nom_ss_100C_1v60 corner): -103.526 ns.
-That puts the actual critical path at roughly 113.5 ns, meaning the design only closes timing at about 8.8 MHz — far below the 100 MHz target. Hold slack is +0.057 ns with zero hold violations, so hold is clean.
+Target clock: 10 ns (100 MHz). Worst-case setup slack (nom_ss_100C_1v60 corner): -103.526 ns. The critical path is 113.5 ns; timing closes at 8.8 MHz. Hold slack is +0.057 ns, zero hold violations.
 
 ## Critical Path
 
-The critical path runs entirely through the combinational MAC tree in `always_comb`. The design instantiates 128 parallel 16-bit multipliers whose products feed a sequential adder tree. With N=128, the adder tree has 7 reduction levels (log2(128)), and each level adds delay through carry-propagation chains in the sky130 standard cell library. The dominant cell types along this path are ANDNOT (77,655 instances), XOR (66,450), and AND (36,340) — all characteristic of a wide unregistered adder tree. There are no source or sink registers bounding this path; the entire 128-MAC reduction happens in a single combinational stage.
+The critical path is the combinational MAC tree in `always_comb`. 128 parallel 16-bit multipliers feed a 7-level adder reduction (log2(128) = 7). Each level adds carry-propagation delay through sky130 cells. No registers bound either end of this path; the full 128-MAC reduction runs in one combinational stage. Top cell types: ANDNOT (77,655), XOR (66,450), AND (36,340). All three come from the MAC tree: multiplication maps to XOR and AND, the adder reduction maps to ANDNOT and OR.
 
 ## Area and Cell Count
 
-Post-synthesis cell count: 243,521 cells. Chip area estimate from Yosys: 87,336 µm². The three largest contributors by instance count are ANDNOT (77,655), XOR (66,450), and AND (36,340), together accounting for roughly 74% of all cells. This distribution is consistent with a fully unrolled multiplier-accumulator array — multiplication maps to XOR and AND trees, and the reduction maps to ANDNOT and OR logic.
+Post-synthesis: 243,521 cells, chip area 87,336 µm² (Yosys estimate). ANDNOT (77,655), XOR (66,450), and AND (36,340) account for 74% of all cells. All three are MAC tree cells.
 
 ## Warnings and Failures
 
-Detailed routing failed at stage 44/78 (DRT-0349: routing congestion). With 243,521 cells, the default floorplan area is too small to route all nets without violations. The pre-PNR STA also reported 104,888 max-slew violations, indicating the combinational tree drives enormous fanout loads that exceed sky130 drive strength limits at the 10 ns clock constraint. These are direct consequences of the fully unrolled single-cycle MAC tree — not a correctness issue, but a physical implementation blocker at this clock target.
+Detailed routing failed at stage 44/78 (DRT-0349). 243,521 cells exceed what the default floorplan can route without congestion. Pre-PNR STA flagged 104,888 max-slew violations: the unregistered tree drives high fanout at 10 ns, exceeding sky130 drive strength limits. Both failures trace to the same root: a fully unrolled single-cycle MAC tree with no pipeline registers. The logic is correct; the physical implementation needs restructuring.
