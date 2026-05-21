@@ -1,0 +1,35 @@
+# M3 Power Report
+# Source: OpenROAD report_power, nom_tt_025C_1v80 corner, mid-PNR stage
+# Run: RUN_2026-05-21_20-44-53, OpenLane 2.3.10, sky130_fd_sc_hd
+# Clock: 20 ns (50 MHz target), design: top (compute_core + axi4s_rx)
+
+===========================================================================
+ report_power
+============================================================================
+======================= nom_tt_025C_1v80 Corner ===================================
+
+Group                    Internal    Switching      Leakage        Total
+                            Power        Power        Power        Power (Watts)
+------------------------------------------------------------------------
+Sequential           8.241e-03    4.030e-06    3.388e-08    8.245e-03   39.2%
+Combinational        2.250e-04    5.177e-04    8.349e-07    7.435e-04    3.5%
+Clock                7.150e-03    4.916e-03    1.759e-08    1.207e-02   57.3%
+Macro                0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.0%
+Pad                  0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.0%
+------------------------------------------------------------------------
+Total                1.562e-02    5.438e-03    8.865e-07    2.105e-02  100.0%
+                         74.2%        25.8%         0.0%
+
+Total power:  21.05 mW  (nom_tt_025C_1v80)
+
+## Notes
+Clock dominates at 57.3% (12.1 mW). This is expected: the 20 ns clock drives
+4,139 flip-flops (2×128×16 shift register + control registers). The MAC tree is
+purely combinational and contributes only 3.5% of total power.
+
+Power at other corners is not available because routing did not complete;
+multi-corner power analysis requires a routed netlist. At ss corner power would
+be lower; at ff corner slightly higher.
+
+For M4: reducing N from 128 to 64 halves the register count and is expected to
+reduce sequential and clock power by roughly 50%, bringing total below 12 mW.

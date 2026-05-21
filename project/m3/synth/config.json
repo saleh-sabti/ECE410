@@ -1,0 +1,15 @@
+{
+  "DESIGN_NAME": "top",
+  "VERILOG_FILES": [
+    "dir::hdl/interface.sv",
+    "dir::hdl/compute_core.sv",
+    "dir::hdl/top.sv"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 20,
+  "PDK": "sky130A",
+  "STD_CELL_LIBRARY": "sky130_fd_sc_hd",
+  "FP_CORE_UTIL": 40,
+  "DIE_AREA": "0 0 1500 1500",
+  "TOP_MODULE": "top"
+}

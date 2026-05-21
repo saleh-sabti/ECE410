@@ -1,0 +1,27 @@
+# M3 Area Report
+# Source: OpenLane 2.3.10, sky130A (sky130_fd_sc_hd), run RUN_2026-05-21_20-44-53
+# Design: top (compute_core + axi4s_rx), N=128, DW=16, ACCW=40, clock 20 ns
+
+## Yosys Synthesis (post-ABC optimization)
+  Number of cells:      222,941
+  Chip area (liberty):  88,038.19 µm²
+
+## OpenROAD Floorplan / Placement
+  Die area:             5,691,320 µm²   (2380.3 × 2391.0 µm)
+  Core area:            5,612,450 µm²
+  Instance count (std): 302,820          (includes tap cells: 79,879; fill: 1,742)
+  Sequential cells:     4,139            (flip-flops)
+  Combinational cells:  215,524
+  Instance area:        1,977,000 µm²   (after repair/buffer insertion)
+  Core utilization:     35.2%
+
+## Cell type breakdown (Yosys, top 3 by count)
+  ANDNOT (sky130_fd_sc_hd__and*): dominant — adder carry chain logic
+  XOR/XNOR: adder sum bits
+  DFF (sky130_fd_sc_hd__dfxtp_2): shift register storage (2 × 128 × 16 = 4,096 FFs)
+
+## Notes
+  Routing: FAILED at OpenROAD DetailedRouting (DRT-0349, stage 43/78).
+  Global routing completed with 0 overflow. Detailed routing reached 20%
+  with 0 violations before encountering an unsupported LEF58_ENCLOSURE rule.
+  Cell count and area are from the successfully completed synthesis and placement stages.

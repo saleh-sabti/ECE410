@@ -1,0 +1,5 @@
+VCD info: dumpfile project/m3/sim/cosim.vcd opened for output.
+Test 1 PASS: ref=1, mic=1, echo_det=1 (expected 1)
+Test 2 PASS: ref=1, mic=-1, echo_det=0 (expected 0)
+PASS: 2/2 tests passed
+project/m3/tb/tb_top.sv:111: $finish called at 2775000 (1ps)
