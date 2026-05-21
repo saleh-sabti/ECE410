@@ -492,3 +492,64 @@ COPT:
 - M3 (due May 24): re-run OpenLane with pipelined compute_core + larger DIE_AREA
 - M4 (due Jun 7): full deliverable package + report
 
+---
+
+## Session 11: May 20-21, 2026
+
+### What We Did
+
+**Week 8 content:**
+- CF8 PDF: AER bandwidth analysis (CMAN only, no CLLM this week)
+- M3 spec reviewed: integration + synthesis milestone
+
+**CF8 CMAN — `codefest/cf08/cman_aer_analysis.md`:**
+- R = N × f = 1024 × 50 = 51,200 spikes/s
+- B = R × 20 = 1.024 Mbit/s
+- All 3 interfaces sustain mean rate; I²C is lowest complexity (3.4 Mbit/s > 1.024)
+- Burst (25% of neurons, 1 ms): 5.12 Mbit/s, ratio 5×, I²C cannot absorb → 86-packet buffer needed
+- Frame-based: 1.024 Mbit/s, AER/frame ratio = 1.0 at f=50 Hz
+- f_crossover = 50 Hz (AER equal to frame-based at the exact given firing rate)
+
+**M3 — all deliverables built and pushed (commit 6b9e04e):**
+
+`project/m3/rtl/top.sv`: integrated top module, instantiates axi4s_rx + compute_core, no glue logic needed
+
+`project/m3/tb/tb_top.sv`: end-to-end co-sim testbench, drives AXI4-S interface only (no direct compute_core access)
+- Test 1: ref=1, mic=1, N+1 beats → echo_det=1 (PASS)
+- Test 2: ref=1, mic=-1, N+1 beats → echo_det=0 (PASS)
+- Fix: N+1 TVALID beats needed (interface 1-cycle latency + N+1 valid_in to fill window)
+
+`project/m3/sim/cosim_run.log`: PASS: 2/2 tests passed
+
+`project/m3/sim/cosim_waveform.png`: end-to-end waveform generated from VCD
+
+**OpenLane 2.3.10 synthesis (Docker: ghcr.io/efabless/openlane2:2.3.10):**
+- Run tag: RUN_2026-05-21_20-44-53
+- Verilator fix: added lint_off BLKLOOPINIT to compute_core copy in ol_run_m3/hdl/
+- Synthesis (Yosys): 222,941 cells, liberty area 88,038 µm²
+- Timing (post-CTS, nom_tt): **WNS = 0 ns, timing CLOSED at 20 ns (50 MHz)**
+- Timing (pre-PNR, nom_ss): WNS = -134 ns (slow corner, unclosed)
+- Power: 21.05 mW total (clock dominates at 57.3%)
+- Routing: FAILED at DRT-0349 (LEF58_ENCLOSURE mcon, OpenLane 2.3.10 limitation, same as CF7)
+- Detailed routing reached 20% with 0 violations before DRT error
+
+### Key Numbers (M3 synthesis)
+
+- Clock: 20 ns (50 MHz)
+- Cells: 222,941 (Yosys), 302,820 (placed, incl. tap/fill)
+- Area: 88,038 µm² (liberty), 1,977,000 µm² (placed instance area), core util 35.2%
+- Setup WNS (nom_tt, post-CTS): 0 ns — timing closed
+- Setup worst slack (nom_tt): +3.477 ns
+- Power: 21.05 mW (clock 12.1 mW, sequential 8.2 mW, combinational 0.7 mW)
+- Routing: DRT-0349 (same as CF7, PDK rule compatibility issue)
+
+### Key Decisions
+
+- N+1 TVALID beats needed in testbench: interface adds 1 cycle, compute_core needs N+1 valid_in
+- Docker direct run (not --dockerized) required in non-interactive WSL2 sessions
+- Scope for M4: reduce N from 128 to 64, halves cell count, still closes M1 question
+
+### Still Pending
+
+- M4 (due Jun 7): N=64 pipelined design, full deliverable package, design justification report
+
