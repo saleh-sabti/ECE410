@@ -30,15 +30,15 @@ All three sustain the mean rate. **I²C is the lowest-complexity interface that 
 
 ## Task 4: Burst Peak Bandwidth
 
-25% of 1024 neurons fire within 1 ms: 0.25 × 1024 = 256 spikes in 1 ms.
+- 25% of 1024 neurons fire within 1 ms: 0.25 × 1024 = 256 spikes in 1 ms.
 
-Peak BW = (256 spikes × 20 bits) / 0.001 s = 5,120,000 bits/s = **5.12 Mbit/s**
+- Peak BW = (256 spikes × 20 bits) / 0.001 s = 5,120,000 bits/s = **5.12 Mbit/s**
 
-Burst-to-mean ratio = 5.12 / 1.024 = **5.0×**
+- Burst-to-mean ratio = 5.12 / 1.024 = **5.0×**
 
-I²C peak rate (3.4 Mbit/s) < burst (5.12 Mbit/s): I²C **cannot absorb the burst** without buffering.
+- I²C peak rate (3.4 Mbit/s) < burst (5.12 Mbit/s): I²C **cannot absorb the burst** without buffering.
 
-Buffering needed: during the 1 ms burst, I²C drains 3.4 Mbit/s × 0.001 s = 3,400 bits. Incoming = 5,120 bits. Excess = 1,720 bits → ceil(1720 / 20) = **86 packets**. A FIFO of at least 86 entries (20 bits each = ~1,720 bits) is sufficient.
+- Buffering needed: during the 1 ms burst, I²C drains 3.4 Mbit/s × 0.001 s = 3,400 bits. Incoming = 5,120 bits. Excess = 1,720 bits → ceil(1720 / 20) = **86 packets**. A FIFO of at least 86 entries (20 bits each = ~1,720 bits) is sufficient.
 
 ---
 
