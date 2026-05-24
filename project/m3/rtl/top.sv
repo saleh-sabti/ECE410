@@ -1,5 +1,5 @@
 /*
- * top.sv : Integrated top module — echo detection chiplet
+ * top.sv : Integrated top module, echo detection chiplet
  *
  * Ports:
  *   clk        in    1         clock (single domain)
