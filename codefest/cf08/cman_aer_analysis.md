@@ -24,7 +24,7 @@ B = R × 20 bits/packet = 51,200 × 20 = 1,024,000 bits/s = **1.024 Mbit/s**
 | I²C | ≤3.4 Mbit/s | Y |
 | AXI4-Lite | ~100 Mbit/s | Y |
 
-All three sustain the mean rate. **I²C is the lowest-complexity interface that suffices** — 1.024 Mbit/s is well within its 3.4 Mbit/s ceiling, and I²C requires only two wires and no dedicated clock line.
+All three sustain the mean rate. **I²C is the lowest-complexity interface that suffices**: 1.024 Mbit/s is well within its 3.4 Mbit/s ceiling, and I²C only needs two wires with no dedicated clock line.
 
 ---
 
@@ -53,4 +53,4 @@ Crossover firing rate: set B_AER = B_frame
 N × f_crossover × 20 = N × 1000  
 f_crossover = 1000 / 20 = **50 Hz**
 
-At f = 50 Hz the two approaches carry identical bandwidth, which is why the ratio is exactly 1.0. AER saves bandwidth whenever mean firing rate is below 50 Hz — in a sparse network, AER sends fewer bits because most neurons are silent most of the time.
+At f = 50 Hz the two approaches carry identical bandwidth, which is why the ratio is exactly 1.0. AER saves bandwidth whenever mean firing rate is below 50 Hz: in a sparse network, most neurons are silent so AER sends fewer bits.
