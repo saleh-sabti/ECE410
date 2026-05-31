@@ -592,7 +592,12 @@ COPT:
 - HW speedup: 2.19x (projected)
 - HW energy: 54.3 nJ/window (projected)
 
+### End of Session
+
+- CF09 committed and pushed (commit c68bdf7)
+- Hand-drawn roofline sketch converted from JPEG to PNG and committed
+- `gen_roofline.py` left untracked (not a deliverable)
+
 ### Still Pending
 
-- Push CF09 commit (user will push after review)
 - M4 (due Jun 7): N=64 design, normalization, post-route power, report
