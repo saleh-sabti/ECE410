@@ -1,4 +1,4 @@
-# ECE 410/510 — Hardware for AI and Machine Learning
+# ECE 410/510 - Hardware for AI and Machine Learning
 **Spring 2026 | Portland State University | Saleh Sabti**
 
 ## Project: Echo Detection Chiplet
