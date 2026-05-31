@@ -19,7 +19,11 @@ codefest/
   cf02/                         CMAN roofline, cProfile, partition rationale
   cf03/                         GEMM CUDA kernels, roofline, COPT GPU forward pass
   cf04/                         INT8 quantization, MAC HDL (LLM A/B + correct), cocotb tests
-  cf05/                         Systolic array trace (CMAN, due May 3)
+  cf05/                         Systolic array trace (CMAN + CLLM)
+  cf06/                         Crossbar + sneak path (CMAN + CLLM)
+  cf07/                         OpenLane synthesis, sparsity breakeven (CMAN + CLLM)
+  cf08/                         AER bandwidth analysis (CMAN)
+  cf09/                         Arithmetic intensity from first principles, benchmarks (CMAN + CLLM)
 
 project/
   heilmeier.md                  Heilmeier Q1-Q3, data-grounded
@@ -43,6 +47,22 @@ project/
       waveform.png              7-signal annotated waveform
     precision.md                INT16 rationale, overflow analysis, error analysis, roofline tie-in
     README.md                   Reproduction instructions
+  m3/
+    rtl/
+      top.sv                    Top-level integration (axi4s_rx + compute_core)
+    tb/
+      tb_top.sv                 End-to-end co-sim testbench — 2/2 PASS
+    sim/
+      cosim_run.log             Co-sim transcript
+      cosim_waveform.png        End-to-end waveform
+    synth/
+      config.json               OpenLane 2 config (50 MHz target)
+      timing_report.txt         WNS = 0 ns (nom_tt, post-CTS)
+      power_report.txt          21.05 mW total
+      area_report.txt           88,038 µm² liberty area
+      critical_path.md          Critical path analysis
+      synthesis_notes.md        Run notes and key numbers
+      openlane_run.log          Full OpenLane 2.3.10 run log
 
 smoke_test/
   adder4.v / adder4_tb.v       LLM smoke test — 4-bit adder
@@ -68,6 +88,10 @@ vvp /tmp/if_sim
 | CF2 + M1 | Apr 12 | Done |
 | CF3 | Apr 19 | Done |
 | CF4 | Apr 27 | Done |
-| CF5 + M2 | May 3 | M2 done / CF5 CMAN in progress |
-| M3 | May 24 | Not started |
-| M4 | Jun 7 | Not started |
+| CF5 + M2 | May 3 | Done |
+| CF6 | May 10 | Done |
+| CF7 | May 17 | Done |
+| CF8 | May 24 | Done |
+| M3 | May 24 | Done (routing DRT failure documented) |
+| CF9 | May 31 | Done |
+| M4 | Jun 7 | In progress |
