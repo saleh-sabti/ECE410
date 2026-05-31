@@ -553,3 +553,46 @@ COPT:
 
 - M4 (due Jun 7): N=64 pipelined design, full deliverable package, design justification report
 
+
+---
+
+## Session 12: May 31, 2026
+
+### What We Did
+
+**CF09 CMAN and CLLM -- all deliverables complete.**
+
+**CF09 CMAN -- `codefest/cf09/cman_ai_analysis.md` + `cman_roofline_sketch.png`:**
+- Dominant kernel: normalized cross-correlation, sliding window, N=128, INT16 inputs, 40-bit accumulator
+- FLOPs per window: 768 (= 6N = 3 dot products x 2N each)
+- Pattern: streaming sliding window, not GEMM
+- AI lower bound (no reuse): 768 FLOPs / 512 bytes = 1.5 FLOP/byte
+- AI upper bound (full shift-reg reuse): 768 FLOPs / 4 bytes = 192 FLOP/byte
+- Platform: sky130 50 MHz, AXI4-S 32-bit = 200 MB/s interface BW
+- Peak compute: 297.7 MOPS (= 768 FLOPs / 129 cycles x 50 MHz)
+- Ridge point: 0.298 GOPS / 0.2 GB/s = 1.49 FLOP/byte
+- Both AI bounds are compute-bound (lower barely, upper deeply)
+- Highest-leverage change: pipeline adder tree to 100 MHz, or reduce N to 64
+
+**CF09 CLLM -- `codefest/cf09/benchmarks/`:**
+- SW baseline (measured): 176,880 windows/sec = 135.84 MOPS, AI = 0.747 FLOP/byte, 180.19 ms wall time
+- HW accelerator (projected): 387,597 windows/sec = 297.67 MOPS, 82.2 ms, 2.19x speedup
+- Projection basis: 50 MHz synthesis closed (WNS = 0 nom_tt), N+1 = 129 cycles/window
+- Energy: 21.05 mW / 387,597 windows/sec = 54.3 nJ/window (projected, pre-route)
+- `benchmark_results.md`: SW vs HW table, speedup computed, projection labeled
+- `roofline_plot.png`: HW roofline with both AI bounds and SW baseline point
+- `roofline_analysis.md`: 281 words, gap analysis, measurement path documented
+- `project/remaining_tasks.md`: 3 specific tasks (N=64 routing fix, normalization implementation, post-route power)
+
+### Key Numbers (CF09)
+
+- AI lower: 1.5 FLOP/byte (sliding window, no reuse)
+- AI upper: 192 FLOP/byte (shift-register reuse)
+- Ridge: 1.49 FLOP/byte (50 MHz, 200 MB/s)
+- HW speedup: 2.19x (projected)
+- HW energy: 54.3 nJ/window (projected)
+
+### Still Pending
+
+- Push CF09 commit (user will push after review)
+- M4 (due Jun 7): N=64 design, normalization, post-route power, report

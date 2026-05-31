@@ -1,0 +1,7 @@
+# Remaining Tasks Before M4
+
+1. **Replace the 128-wide combinational MAC tree with a 64-wide pipelined version (N=64).** The M3 design has a 128-wide purely combinational adder tree that routed to DRT failure. Halving N to 64 cuts the adder tree depth by 1 level, reduces cell count from ~222K to ~110K, and is projected to clear the routing congestion that caused the DRT-0349 error. Update `compute_core.sv` with the N=64 parameter, re-run OpenLane 2, and confirm DRT passes before M4 submission.
+
+2. **Add the two missing dot products to compute_core (ref energy and mic energy) and implement the normalization comparator.** The current hardware compares the raw cross-correlation accumulator against a fixed threshold instead of computing the normalized coefficient rho = cross / sqrt(ref_energy * mic_energy). For M4, implement both energy accumulators and a comparison of cross^2 >= threshold^2 * ref_energy * mic_energy (integer squaring, no sqrt required) to make the hardware match the software specification.
+
+3. **Collect and document a post-route power and timing report from a completed OpenLane run.** The M3 synthesis power figure (21.05 mW) is pre-route and uses mid-PNR estimates. A finished routing run would provide the actual wire capacitances needed to compute real dynamic power, confirm the 50 MHz timing closure under actual parasitics, and produce a valid energy-per-window number for the M4 report. This is a prerequisite for any energy efficiency claim in M4.
