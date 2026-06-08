@@ -57,27 +57,35 @@ project/
       cosim_waveform.png        End-to-end waveform
     synth/
       config.json               OpenLane 2 config (50 MHz target)
-      timing_report.txt         WNS = 0 ns (nom_tt, post-CTS)
-      power_report.txt          21.05 mW total
-      area_report.txt           88,038 µm² liberty area
-      critical_path.md          Critical path analysis
-      synthesis_notes.md        Run notes and key numbers
+      timing_report.txt         Pre-CTS STA summary (post-CTS WNS=0 nom_tt in synthesis_notes.md)
+      power_report.txt          21.05 mW total (placed netlist, nom_tt)
+      area_report.txt           88,038 µm² liberty area, 222,941 cells
+      critical_path.md          Critical path: ref_buf[127] → adder tree → echo_det
+      synthesis_notes.md        Run notes, key numbers, DRT-0349 failure documented
       openlane_run.log          Full OpenLane 2.3.10 run log
+  m4/
+    design_justification.md    M4 design justification report (all 9 required sections)
 
 smoke_test/
   adder4.v / adder4_tb.v       LLM smoke test — 4-bit adder
 ```
 
-## Running M2 Simulations
+## Running Simulations
 
 Requires Icarus Verilog 12.0. Run from repo root:
 
 ```bash
+# M2: compute core
 iverilog -g2012 -o /tmp/cc_sim project/m2/rtl/compute_core.sv project/m2/tb/tb_compute_core.sv
 vvp /tmp/cc_sim
 
+# M2: AXI4-Stream interface
 iverilog -g2012 -o /tmp/if_sim project/m2/rtl/interface.sv project/m2/tb/tb_interface.sv
 vvp /tmp/if_sim
+
+# M3: end-to-end co-simulation
+iverilog -g2012 -o /tmp/top_sim project/m3/rtl/top.sv project/m2/rtl/interface.sv project/m2/rtl/compute_core.sv project/m3/tb/tb_top.sv
+vvp /tmp/top_sim
 ```
 
 ## Milestones
@@ -94,4 +102,4 @@ vvp /tmp/if_sim
 | CF8 | May 24 | Done |
 | M3 | May 24 | Done (routing DRT failure documented) |
 | CF9 | May 31 | Done |
-| M4 | Jun 7 | In progress |
+| M4 | Jun 7 | Done |
