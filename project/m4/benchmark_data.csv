@@ -1,0 +1,34 @@
+metric,value,unit,source,notes
+kernel,normalized cross-correlation (echo detection),,project/m4/design_justification.md,
+precision,INT16,,project/m2/precision.md,16-bit signed integer samples; 40-bit accumulator
+dataflow,input-stationary streaming,,project/m4/design_justification.md,shift-register on-chip; no weight stationary needed (no weights)
+interface,AXI4-Stream,,project/m2/rtl/interface.sv,TVALID/TREADY 32-bit @ 50 MHz
+clock_period_ns,20,ns,project/m3/synth/timing_report.txt,target 50 MHz
+frequency_mhz,50,MHz,project/m3/synth/timing_report.txt,timing closed nom_tt_025C_1v80
+wns_ns,3.477,ns,project/m3/synth/timing_report.txt,post-CTS WNS; no violations
+area_liberty_um2,88038,um^2,project/m3/synth/area_report.txt,Yosys liberty area
+area_placed_um2,1977000,um^2,project/m3/synth/area_report.txt,placed instance area (302820 cells including tap/fill)
+cell_count_yosys,222941,cells,project/m3/synth/area_report.txt,Yosys synthesis cell count
+cell_count_placed,302820,cells,project/m3/synth/area_report.txt,includes tap and fill cells
+core_utilization_pct,35.2,%,project/m3/synth/area_report.txt,
+power_total_mw,21.05,mW,project/m3/synth/power_report.txt,post-CTS placed netlist; nom_tt_025C_1v80; 1.80V 25C
+power_clock_mw,12.10,mW,project/m3/synth/power_report.txt,57.3% of total; clock tree driving 4139 FFs
+power_sequential_mw,8.20,mW,project/m3/synth/power_report.txt,39.2% of total
+power_combinational_mw,0.74,mW,project/m3/synth/power_report.txt,3.5% of total; MAC adder tree
+sw_baseline_platform,Intel Core Ultra 7 155H WSL2 Python 3.12.3,,project/m1/sw_baseline.md,
+sw_baseline_windows_per_sec,122585,windows/sec,project/m1/sw_baseline.md,median over 10 runs; 31872 windows; N=128
+sw_baseline_wall_clock_s,0.260,s,project/m1/sw_baseline.md,2 seconds of audio at 16 kHz
+sw_baseline_mflops,94.1,MFLOP/s,project/m1/sw_baseline.md,measured; explicit MAC loop; float32
+sw_baseline_ai,0.747,FLOP/byte,project/m1/sw_baseline.md,no cache reuse; memory-bound on CPU
+hw_cycles_per_window,129,cycles,project/m4/design_justification.md,N+1 = 129 (N=128 to fill shift register; 1 to output)
+hw_windows_per_sec,387597,windows/sec,project/m4/design_justification.md,50e6 / 129; projected from synthesis
+hw_wall_clock_s,0.0822,s,project/m4/design_justification.md,31872 windows / 387597 windows/sec; projected
+hw_throughput_mflops,297.7,MFLOP/s,project/m4/design_justification.md,387597 * 768 FLOP/window; projected
+hw_ai_on_chip,192,FLOP/byte,project/m4/design_justification.md,shift-register reuse: 768 FLOP / 4 bytes (2 new samples/window)
+speedup_throughput_x,3.16,,project/m4/design_justification.md,387597 / 122585; projected vs measured Python baseline
+energy_hw_nj_per_window,54.3,nJ/window,project/m4/design_justification.md,21.05 mW / 387597 windows/sec; projected
+energy_cpu_mw_active,~15000,mW,project/m4/design_justification.md,CPU P-core during inner loop; ~700x worse than chiplet
+routing_status,global_routing_only,,project/m3/synth/openlane_run.log,DRT-0349 LEF58_ENCLOSURE mcon rule not supported in OpenLane 2.3.10 + sky130A; not a design error
+verification_tb_compute_core,2/2 PASS,,project/m2/sim/compute_core_run.log,
+verification_tb_interface,4/4 PASS,,project/m2/sim/interface_run.log,
+verification_tb_top_cosim,2/2 PASS,,project/m3/sim/cosim_run.log,end-to-end AXI4-S to echo_det output
